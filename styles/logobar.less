@@ -1,0 +1,35 @@
+@import "../index.less";
+@import "./titlebar.less";
+
+.logo-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding-top: @title-bar-height;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.logo-bar-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 95%;
+}
+
+.logo-bar-drag {
+    -webkit-app-region: drag;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 70%;
+}
+
+.logo {
+    height: auto;
+    width: 75%;
+    min-height: 30px;
+}

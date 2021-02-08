@@ -1,0 +1,140 @@
+@import "../index.less";
+@import "./titlebar.less";
+
+.settings-dialog {
+    position: fixed;
+    z-index: 700;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding-top: @title-bar-height;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.settings-dialog-box {
+    margin-top: -10px;
+    width: 60%;
+    height: 80%;
+    border-radius: 10px;
+    background-color: #673efa;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.settings-title-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.settings-title {
+    color: black;
+    font-size: 20px;
+    font-family: "Maven Pro", sans-serif;
+    user-select: text;
+    cursor: text;
+    &::selection {
+        background-color: #846eff;
+    }
+}
+
+.settings-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.settings-text {
+    user-select: text;
+    cursor: text;
+    color: black;
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 15px;
+    &::selection {
+        background-color: #846eff;
+    }
+}
+
+.settings-input {
+    color: black;
+    border: none;
+    margin-left: 10px;
+    width: 50px;
+    font-family: "Yusei Magic", sans-serif;
+    font-size: 15px;
+    background-color: transparent;
+    &::selection {
+        background-color: #846eff;
+    }
+}
+
+.settings-checkbox {
+    margin-left: 15px;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
+.settings-button-container {
+    display: flex;
+    flex-direction: row;
+    margin-top: 5px;
+    width: 100%;
+    justify-content: space-evenly;
+    margin-bottom: 10px;
+}
+
+.revert-button {
+    border: none;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 14px;
+    padding-right: 14px;
+    color: black;
+    font-size: 20px;
+    font-family: "Maven Pro", sans-serif;
+    background-color: #563bf0;
+    border: 3px solid black;
+    &:hover {
+        border: 3px solid white;
+        cursor: pointer;
+    }
+}
+
+.ok-button {
+    border: none;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 14px;
+    padding-right: 14px;
+    color: black;
+    font-size: 20px;
+    font-family: "Maven Pro", sans-serif;
+    background-color: #355aff;
+    border: 3px solid black;
+    &:hover {
+        color: white;
+        border: 3px solid white;
+        cursor: pointer;
+    }
+}

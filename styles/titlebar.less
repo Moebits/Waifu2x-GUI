@@ -1,0 +1,84 @@
+@import "../index.less";
+
+@title-bar-height: 30px;
+
+.title-bar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    user-select: none;
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    height: @title-bar-height;
+    background-color: #4d84d9;
+    z-index: 1000;
+    -webkit-app-region: no-drag;
+}
+
+.title-bar-drag-area {
+    -webkit-app-region: drag;
+    display: flex;
+    align-items: center;
+    width: 99%;
+    height: 90%;
+}
+
+.title-container  {
+    margin-left: 3px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: fixed;
+    z-index: 2000;
+    top: 0px;
+    left: 0px; 
+}
+
+.title {
+    margin-left: 5px;
+    user-select: text;
+    color: black;
+    font-size: 18px;
+    font-family: "Maven Pro", sans-serif;
+    &:hover {
+        cursor: text;
+        color: white;
+    }
+}
+   
+.title-bar-buttons {
+    -webkit-app-region: no-drag;
+    display: flex;
+    flex-direction: row;
+    position: fixed;
+    z-index: 2000;
+    top: 0px;
+    right: 0px;
+}
+
+.title-bar-button {
+    -webkit-app-region: no-drag;
+    margin-top: 3px;
+    margin-right: 12px;
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+@keyframes rotation {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.update-button:hover {
+    animation: rotation 2s linear 0s infinite forwards;
+}
+
+.settings-button:hover {
+    animation: rotation 5s linear 0s infinite forwards;
+}

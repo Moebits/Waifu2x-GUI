@@ -1,0 +1,93 @@
+{
+  "name": "waifu2x-gui",
+  "version": "0.0.1",
+  "description": "A gui app that upscales anime-styled images with waifu2x",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "npm run clean && webpack && electron dist/main.js",
+    "clean": "del-cli ./dist",
+    "build": "npm run clean ./build && webpack && electron-builder -p never",
+    "release": "npm run clean ./build && webpack && electron-builder -p always"
+  },
+  "keywords": [
+    "waifu2x",
+    "GUI",
+    "anime",
+    "upscaling"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tenpi/Waifu2x-GUI"
+  },
+  "build": {
+    "appId": "com.tenpi.waifu2x",
+    "productName": "Waifu2x GUI",
+    "icon": "./assets/icon.png",
+    "directories": {
+      "buildResources": "assets",
+      "output": "build"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "uninstallDisplayName": "Waifu2x GUI",
+      "createDesktopShortcut": "always",
+      "installerSidebar": "./assets/installer.bmp",
+      "uninstallerSidebar": "./assets/installer.bmp"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "extraFiles": [
+      "ffmpeg/**/*"
+    ],
+    "publish": {
+      "provider": "github",
+      "repo": "Waifu2x-GUI",
+      "owner": "Tenpi",
+      "releaseType": "draft"
+    }
+  },
+  "author": "Tenpi",
+  "license": "MIT",
+  "devDependencies": {
+    "@tenpi/tslint": "^1.1.0",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "css-loader": "^5.0.1",
+    "del-cli": "^3.0.1",
+    "electron": "^11.2.1",
+    "electron-builder": "^22.9.1",
+    "file-loader": "^6.2.0",
+    "fork-ts-checker-webpack-plugin": "^6.1.0",
+    "html-loader": "^1.3.2",
+    "html-webpack-plugin": "^4.5.1",
+    "less": "^4.1.0",
+    "less-loader": "^7.3.0",
+    "mini-css-extract-plugin": "^1.3.5",
+    "node-loader": "^1.0.2",
+    "terser-webpack-plugin": "^5.1.1",
+    "ts-loader": "^8.0.14",
+    "typescript": "^4.1.3",
+    "webpack": "^5.18.0",
+    "webpack-cli": "^4.4.0"
+  },
+  "dependencies": {
+    "bootstrap": "^4.6.0",
+    "electron-store": "^7.0.1",
+    "electron-updater": "^4.3.5",
+    "image-size": "^0.9.3",
+    "react": "^17.0.1",
+    "react-bootstrap": "^1.4.3",
+    "react-dom": "^17.0.1",
+    "react-dropzone": "^11.3.0",
+    "react-reorder": "^3.0.0-alpha.7",
+    "shade-blend-color": "^1.0.0",
+    "waifu2x": "^0.6.0"
+  }
+}

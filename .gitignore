@@ -1,0 +1,5 @@
+dist
+build
+node_modules
+.env
+waifu2x

@@ -1,0 +1,101 @@
+@import "../index.less";
+
+.global-settings {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 7px;
+    width: 100%;
+}
+
+.global-settings-box {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.global-settings-text {
+    color: black;
+    font-size: 23px;
+    font-family: "Maven Pro", sans-serif;
+    cursor: text;
+    user-select: text;
+}
+
+.global-settings-input {
+    margin-left: 6px;
+    color: black;
+    font-size: 23px;
+    font-family: "Maven Pro", sans-serif;
+    height: 30px;
+    width: 40px;
+    border: none;
+    background-color: transparent;
+    &:focus {
+        outline: none;
+    }
+    &:first-child {
+        width: 20px;
+    }
+}
+
+.global-settings-checkbox {
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.btn {
+    color: black;
+    font-size: 17px;
+    font-family: "Maven Pro", sans-serif;
+    padding: 1px 3px;
+    background-color: #4d84d9;
+    border-color: transparent;
+    margin-left: 10px;
+    margin-right: 10px;
+    &:hover {
+        border-color: transparent;
+        background-color: #4d84d9;
+    }
+    &:focus {
+        color: black !important;
+        border-color: transparent !important;
+        background-color: #4d84d9 !important;
+        box-shadow: none !important;
+    }
+}
+
+.dropdown-toggle {
+    color: black !important;
+    border-color: transparent !important;
+    background-color: #4d84d9 !important;
+    &:hover {
+        color: white !important;
+    }
+    &::after {
+        content: none !important; 
+    }
+}
+
+.dropdown-menu {
+    background-color: #4985b4;
+    min-width: 0;
+    padding: 0;
+    border: none;
+}
+
+.dropdown-item {
+    color: black;
+    font-size: 15px;
+    font-family: "Maven Pro", sans-serif;
+    padding: 3px 2px;
+    &:hover {
+        background-color: #72bcf5;
+    }
+}
+
+.dropdown-item.active, .dropdown-item:active {
+    background-color: #4d84d9;
+}

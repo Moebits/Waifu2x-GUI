@@ -1,0 +1,95 @@
+@import url("https://fonts.googleapis.com/css2?family=Maven+Pro:wght@700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Skranji&display=swap");
+
+:root {
+    --selection-color: #b5d7ff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+html, body {
+    background-color: #5ea8da;
+    overflow-x: hidden;
+}
+
+body {
+    overflow-y: hidden;
+}
+
+p {
+    margin-bottom: 0;
+}
+
+@keyframes fadein {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+}
+
+.app {
+    -webkit-app-region: no-drag;
+    animation: fadein 0.5s;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    width: 100%;
+    height: 100%;
+}
+
+::selection {
+    background-color: var(--selection-color);
+    color: white;
+}
+
+::-webkit-scrollbar {
+    width: 20px;
+}
+  
+::-webkit-scrollbar-track {
+    background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #5a5a5a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #303030;
+}
+
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration { display: none; }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input:focus, button:focus, select:focus {
+    outline: none;
+}
+
+img, p {
+    -webkit-user-drag: none;
+}
+
+img {
+    image-rendering: -webkit-optimize-contrast;
+}
+
+ul {
+    list-style-type: none;
+}

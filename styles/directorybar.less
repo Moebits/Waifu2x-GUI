@@ -1,0 +1,34 @@
+@import "../index.less";
+@import "./fileselector.less";
+
+.directory-bar {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 6px;
+}
+
+.directory-bar-center {
+    display: flex;
+    align-items: center;
+    width: @selector-width;
+}
+
+.directory-bar-img {
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.directory-bar-box {
+    border: 2px solid black;
+    border-radius: 3px;
+    padding: 1px 4px;
+    width: 100%;
+    color: black;
+    background-color: #4985b4;
+    user-select: text;
+    font-family: "Fira Sans", sans-serif;
+    font-size: 18px;
+    margin-left: 5px;
+}
