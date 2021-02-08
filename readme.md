@@ -12,7 +12,7 @@ Note: Upscaling videos and gifs will take a very long time without a high-end gr
 - Upscale and/or denoise GIFs
 - Upscale and/or denoise videos (mp4, webm, ogv, etc.)
 - Apply effects such as speed or reverse (gifs/videos)
-- Customizable settings (noise, scale, mode, framerate, etc.)
+- Customize settings (noise, scale, mode, framerate, etc.)
 - Upscale multiple images (or multiple frames of a gif/video) concurrently
 
 Warning: Upscaling too many images in parallel can cause your computer to freeze if it runs out of CPU/memory.
@@ -30,4 +30,3 @@ Open an issue on my GitHub repository. I appreciate any requests, but I can't gu
 - [my waifu2x npm module](https://github.com/Tenpi/waifu2x)
 - [waifu2x-converter-cpp](https://github.com/DeadSix27/waifu2x-converter-cpp)
 - [waifu2x](https://github.com/nagadomi/waifu2x)
-- [ffmpeg](https://ffmpeg.org/)
