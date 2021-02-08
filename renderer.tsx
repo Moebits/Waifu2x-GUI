@@ -1,5 +1,4 @@
 import "bootstrap/dist/css/bootstrap.min.css"
-import {ipcRenderer} from "electron"
 import React, {useEffect, useState} from "react"
 import ReactDom from "react-dom"
 import AdvancedSettings from "./components/AdvancedSettings"
@@ -8,6 +7,7 @@ import FileContainerList from "./components/FileContainerList"
 import FileSelector from "./components/FileSelector"
 import GlobalSettings from "./components/GlobalSettings"
 import LogoBar from "./components/LogoBar"
+import Preview from "./components/Preview"
 import StartAll from "./components/StartAll"
 import TitleBar from "./components/TitleBar"
 import VersionDialog from "./components/VersionDialog"
@@ -54,7 +54,7 @@ const App = () => {
   const [parallelFrames, setParallelFrames] = useState(1)
   const [disableGPU, setDisableGPU] = useState(false)
   const [forceOpenCL, setForceOpenCL] = useState(false)
-  const [blockSize, setBlockSize] = useState(512)
+  const [blockSize, setBlockSize] = useState(1024)
   const [threads, setThreads] = useState(4)
   const [rename, setRename] = useState("2x")
 
@@ -83,6 +83,7 @@ const App = () => {
         <TitleBar/>
         <VersionDialog/>
         <AdvancedSettings/>
+        <Preview/>
         <LogoBar/>
         <FileSelector/>
         <DirectoryBar/>

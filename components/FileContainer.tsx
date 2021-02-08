@@ -69,6 +69,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const [lockedStats, setLockedStats] = useState({}) as any
     const [progressLock, setProgressLock] = useState(false)
     const [startSignal, setStartSignal] = useState(false)
+    const [drag, setDrag] = useState(false)
     const progressBarRef = useRef(null) as React.RefObject<HTMLDivElement>
     const fileContainerRef = useRef(null) as React.RefObject<HTMLElement>
 
@@ -203,11 +204,15 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         document.documentElement.style.setProperty("--selection-color", "#b5d7ff")
     }
 
+    const preview = () => {
+        if (!drag) ipcRenderer.invoke("preview", props.source, props.type)
+    }
+
     return (
         <section ref={fileContainerRef} className="file-wrap-container" onMouseOver={() => setHover(true)} onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
-            <div className="file-container" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+            <div className="file-container" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} onMouseDown={() => setDrag(false)} onMouseMove={() => setDrag(true)}>
             <div className="file-img-container">
-                {props.type === "video" ? <video className="file-img" muted autoPlay loop><source src={props.source}></source></video> : <img className="file-img" src={props.source}/>}
+                {props.type === "video" ? <video className="file-img" onMouseUp={preview} muted autoPlay loop><source src={props.source}></source></video> : <img className="file-img" onMouseUp={preview} src={props.source}/>}
             </div>
             <div className="file-middle">
                 <div className="file-group-top">

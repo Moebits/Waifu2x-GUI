@@ -91,7 +91,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setParallelFrames(1)
         setDisableGPU(false)
         setForceOpenCL(false)
-        setBlockSize(512)
+        setBlockSize(1024)
         setThreads(4)
         setNoise(2)
         setScale(2)

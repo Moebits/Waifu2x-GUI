@@ -21,6 +21,10 @@ const store = new Store()
 
 const active: Array<{id: number, source: string, dest: string, type: "image" | "gif" | "video", action: null | "stop"}> = []
 
+ipcMain.handle("preview", (event, image: string, type: string) => {
+  window?.webContents.send("preview", image, type)
+})
+
 ipcMain.handle("init-settings", () => {
   return store.get("settings", null)
 })
