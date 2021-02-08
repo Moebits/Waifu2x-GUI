@@ -1,4 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css"
+import {ipcRenderer} from "electron"
 import React, {useEffect, useState} from "react"
 import ReactDom from "react-dom"
 import AdvancedSettings from "./components/AdvancedSettings"
