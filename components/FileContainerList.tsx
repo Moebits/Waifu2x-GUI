@@ -2,13 +2,14 @@ import {ipcRenderer} from "electron"
 import fs from "fs"
 import React, {useContext, useEffect, useState} from "react"
 import Reorder from "react-reorder"
-import {StartAllContext} from "../renderer"
+import {ClearAllContext, StartAllContext} from "../renderer"
 import functions from "../structures/functions"
 import "../styles/filecontainerlist.less"
 import FileContainer from "./FileContainer"
 
 const FileContainerList: React.FunctionComponent = (props) => {
     const {startAll, setStartAll} = useContext(StartAllContext)
+    const {clearAll, setClearAll} = useContext(ClearAllContext)
     const [containers, setContainers] = useState([] as  Array<{id: number, started: boolean, jsx: any}>)
     useEffect(() => {
         const addFiles = async (event: any, files: string[], identifiers: number[]) => {
@@ -25,14 +26,17 @@ const FileContainerList: React.FunctionComponent = (props) => {
         }
         ipcRenderer.on("add-files", addFiles)
         ipcRenderer.on("start-all", startAllFunc)
+        ipcRenderer.on("clear-all", clearAllFunc)
         return () => {
             ipcRenderer.removeListener("add-files", addFiles)
             ipcRenderer.removeListener("start-all", startAllFunc)
+            ipcRenderer.removeListener("clear-all", clearAllFunc)
         }
     }, [])
 
     useEffect(() => {
         updateStartAll()
+        updateClearAll()
     })
 
     const startAllFunc = () => {
@@ -55,6 +59,16 @@ const FileContainerList: React.FunctionComponent = (props) => {
             }
         }
         setStartAll(found)
+    }
+
+    const clearAllFunc = () => {
+        setContainers([])
+        setStartAll(false)
+    }
+
+    const updateClearAll = () => {
+        const found = containers.length ? true : false
+        setClearAll(found)
     }
 
     const removeContainer = (id: number) => {

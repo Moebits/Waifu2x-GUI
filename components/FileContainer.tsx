@@ -6,6 +6,7 @@ import pSBC from "shade-blend-color"
 import arrow from "../assets/arrow.png"
 import closeContainerHover from "../assets/closeContainer-hover.png"
 import closeContainer from "../assets/closeContainer.png"
+import contract from "../assets/contract.png"
 import expand from "../assets/expand.png"
 import locationButtonHover from "../assets/locationButton-hover.png"
 import locationButton from "../assets/locationButton.png"
@@ -69,7 +70,9 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const [lockedStats, setLockedStats] = useState({}) as any
     const [progressLock, setProgressLock] = useState(false)
     const [startSignal, setStartSignal] = useState(false)
+    const [clearSignal, setClearSignal] = useState(false)
     const [drag, setDrag] = useState(false)
+    const [showNew, setShowNew] = useState(false)
     const progressBarRef = useRef(null) as React.RefObject<HTMLDivElement>
     const fileContainerRef = useRef(null) as React.RefObject<HTMLElement>
 
@@ -86,18 +89,24 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         const conversionFinished = (event: any, info: {id: number, output: string}) => {
             if (info.id === props.id) {
                 setOutput(info.output)
+                setShowNew(true)
             }
         }
         const startAll = () => {
             setStartSignal(true)
         }
+        const clearAll = () => {
+            setClearSignal(true)
+        }
         ipcRenderer.on("conversion-progress", conversionProgress)
         ipcRenderer.on("conversion-finished", conversionFinished)
         ipcRenderer.on("start-all", startAll)
+        ipcRenderer.on("clear-all", clearAll)
         return () => {
             ipcRenderer.removeListener("conversion-progress", conversionProgress)
             ipcRenderer.removeListener("conversion-finished", conversionFinished)
             ipcRenderer.removeListener("start-all", startAll)
+            ipcRenderer.removeListener("clear-all", clearAll)
         }
     }, [])
 
@@ -105,6 +114,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         updateProgressColor()
         updateBackgroundColor()
         if (!started && startSignal) startConversion()
+        if (clearSignal) closeConversion()
     })
 
     const startConversion = () => {
@@ -201,24 +211,31 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     }
 
     const mouseLeave = () => {
+        setHover(false)
         document.documentElement.style.setProperty("--selection-color", "#b5d7ff")
     }
 
-    const preview = () => {
-        if (!drag) ipcRenderer.invoke("preview", props.source, props.type)
+    const preview = (event: React.MouseEvent<HTMLElement>) => {
+        if (event.ctrlKey) return ipcRenderer.invoke("add-file", props.source)
+        const source = showNew ? output : props.source
+        if (!drag) ipcRenderer.invoke("preview", source, props.type)
+    }
+
+    const toggleNew = () => {
+        if (output) setShowNew((prev) => !prev)
     }
 
     return (
         <section ref={fileContainerRef} className="file-wrap-container" onMouseOver={() => setHover(true)} onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
             <div className="file-container" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} onMouseDown={() => setDrag(false)} onMouseMove={() => setDrag(true)}>
             <div className="file-img-container">
-                {props.type === "video" ? <video className="file-img" onMouseUp={preview} muted autoPlay loop><source src={props.source}></source></video> : <img className="file-img" onMouseUp={preview} src={props.source}/>}
+                {props.type === "video" ? <video className="file-img" onMouseUp={preview} muted autoPlay loop><source src={showNew ? output : props.source}></source></video> : <img className="file-img" onMouseUp={preview} src={showNew ? output : props.source}/>}
             </div>
             <div className="file-middle">
                 <div className="file-group-top">
                     <div className="file-name">
-                        <p className="file-text bigger hover" onClick={() => remote.shell.showItemInFolder(path.normalize(props.source))}>{functions.cleanTitle(path.basename(props.source))}</p>
-                        <img className="file-expand" width="20" height="20" src={expand}/>
+                        <p className="file-text bigger"><span className="hover" onClick={() => remote.shell.showItemInFolder(path.normalize(props.source))}>{functions.cleanTitle(path.basename(props.source))}</span></p>
+                        <img className="file-expand" onMouseDown={(event) => event.stopPropagation()} width="20" height="20" onClick={toggleNew} src={showNew ? contract : expand}/>
                     </div>
                     <div className="file-info">
                             <p className="file-text" onMouseDown={(event) => event.stopPropagation()}>{props.width}x{props.height}</p>

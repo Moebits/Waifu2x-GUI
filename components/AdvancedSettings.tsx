@@ -84,7 +84,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setOriginalFramerate(true)
         setFramerate(24)
         setVideoQuality(16)
-        setGIFCumulative(false)
+        setGIFCumulative(true)
         setGIFQuality(10)
         setPNGCompression(3)
         setJPGQuality(100)

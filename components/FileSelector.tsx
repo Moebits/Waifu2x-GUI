@@ -13,6 +13,12 @@ const FileSelector: React.FunctionComponent = (props) => {
     const [id, setID] = useState(1)
 
     useEffect(() => {
+        const addFile = (event: any, file: string) => {
+            setID((prev) => {
+                ipcRenderer.invoke("add-files", [file], [prev])
+                return prev + 1
+            })
+        }
         const dragOver = () => {
             functions.logoDrag(false)
             setDrag(true)
@@ -21,10 +27,12 @@ const FileSelector: React.FunctionComponent = (props) => {
             functions.logoDrag(true)
             setDrag(false)
         }
+        ipcRenderer.on("add-file", addFile)
         document.addEventListener("dragover", dragOver)
         document.addEventListener("dragleave", dragLeave)
         document.addEventListener("drop", dragLeave)
         return () => {
+            ipcRenderer.removeListener("add-file", addFile)
             document.removeEventListener("dragover", dragOver)
             document.removeEventListener("dragleave", dragLeave)
             document.removeEventListener("drop", dragLeave)

@@ -106,6 +106,10 @@ ipcMain.handle("start-all", () => {
   window?.webContents.send("start-all")
 })
 
+ipcMain.handle("clear-all", () => {
+  window?.webContents.send("clear-all")
+})
+
 ipcMain.handle("upscale", async (event, info: any) => {
   const options = {
     noise: Number(info.noise) as any,
@@ -167,6 +171,10 @@ ipcMain.handle("get-dimensions", async (event, path: string, type: string) => {
 
 ipcMain.handle("add-files", (event, files: string[], identifers: number[]) => {
   window?.webContents.send("add-files", files, identifers)
+})
+
+ipcMain.handle("add-file", (event, file: string) => {
+  window?.webContents.send("add-file", file)
 })
 
 ipcMain.handle("select-files", async () => {

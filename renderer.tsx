@@ -6,9 +6,9 @@ import DirectoryBar from "./components/DirectoryBar"
 import FileContainerList from "./components/FileContainerList"
 import FileSelector from "./components/FileSelector"
 import GlobalSettings from "./components/GlobalSettings"
+import GroupAction from "./components/GroupAction"
 import LogoBar from "./components/LogoBar"
 import Preview from "./components/Preview"
-import StartAll from "./components/StartAll"
 import TitleBar from "./components/TitleBar"
 import VersionDialog from "./components/VersionDialog"
 import "./index.less"
@@ -20,6 +20,7 @@ export const ModeContext = React.createContext<any>(null)
 export const SpeedContext = React.createContext<any>(null)
 export const ReverseContext = React.createContext<any>(null)
 export const StartAllContext = React.createContext<any>(null)
+export const ClearAllContext = React.createContext<any>(null)
 
 export const OriginalFramerateContext = React.createContext<any>(null)
 export const FramerateContext = React.createContext<any>(null)
@@ -43,12 +44,13 @@ const App = () => {
   const [speed, setSpeed] = useState(1)
   const [reverse, setReverse] = useState(false)
   const [startAll, setStartAll] = useState(false)
+  const [clearAll, setClearAll] = useState(false)
 
   const [originalFramerate, setOriginalFramerate] = useState(true)
   const [framerate, setFramerate] = useState(24)
   const [videoQuality, setVideoQuality] = useState(16)
   const [gifQuality, setGIFQuality] = useState(10)
-  const [gifCumulative, setGIFCumulative] = useState(false)
+  const [gifCumulative, setGIFCumulative] = useState(true)
   const [pngCompression, setPNGCompression] = useState(3)
   const [jpgQuality, setJPGQuality] = useState(100)
   const [parallelFrames, setParallelFrames] = useState(1)
@@ -74,6 +76,7 @@ const App = () => {
       <VideoQualityContext.Provider value={{videoQuality, setVideoQuality}}>
       <FramerateContext.Provider value ={{framerate, setFramerate}}>
       <StartAllContext.Provider value={{startAll, setStartAll}}>
+      <ClearAllContext.Provider value={{clearAll, setClearAll}}>
       <DirectoryContext.Provider value={{directory, setDirectory}}>
       <NoiseContext.Provider value={{noise, setNoise}}>
       <ScaleContext.Provider value={{scale, setScale}}>
@@ -88,7 +91,7 @@ const App = () => {
         <FileSelector/>
         <DirectoryBar/>
         <GlobalSettings/>
-        <StartAll/>
+        <GroupAction/>
         <FileContainerList/>
       </ReverseContext.Provider>
       </SpeedContext.Provider>
@@ -96,6 +99,7 @@ const App = () => {
       </ScaleContext.Provider>
       </NoiseContext.Provider>
       </DirectoryContext.Provider>
+      </ClearAllContext.Provider>
       </StartAllContext.Provider>
       </FramerateContext.Provider>
       </VideoQualityContext.Provider>
