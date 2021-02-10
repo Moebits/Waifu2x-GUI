@@ -11,7 +11,11 @@ const FileContainerList: React.FunctionComponent = (props) => {
     const {startAll, setStartAll} = useContext(StartAllContext)
     const {clearAll, setClearAll} = useContext(ClearAllContext)
     const [containers, setContainers] = useState([] as  Array<{id: number, started: boolean, jsx: any}>)
+    const [addSignal, setAddSignal] = useState(null) as any
     useEffect(() => {
+        const addFile = async (event: any, file: string, pos: number, id: number) => {
+            setAddSignal({file, pos, id})
+        }
         const addFiles = async (event: any, files: string[], identifiers: number[]) => {
             for (let i = 0; i < files.length; i++) {
                 const type = functions.getType(files[i])
@@ -25,10 +29,12 @@ const FileContainerList: React.FunctionComponent = (props) => {
             }
         }
         ipcRenderer.on("add-files", addFiles)
+        ipcRenderer.on("add-file-id", addFile)
         ipcRenderer.on("start-all", startAllFunc)
         ipcRenderer.on("clear-all", clearAllFunc)
         return () => {
             ipcRenderer.removeListener("add-files", addFiles)
+            ipcRenderer.removeListener("add-file-id", addFile)
             ipcRenderer.removeListener("start-all", startAllFunc)
             ipcRenderer.removeListener("clear-all", clearAllFunc)
         }
@@ -36,7 +42,23 @@ const FileContainerList: React.FunctionComponent = (props) => {
 
     useEffect(() => {
         update()
+        if (addSignal) addSignalFunc()
     })
+
+    const addSignalFunc = async () => {
+        const signal = addSignal
+        setAddSignal(null)
+        let index = containers.findIndex((c) => c.id === signal.pos)
+        if (index === -1) index = containers.length
+        const type = functions.getType(signal.file)
+        if (!type) return
+        const dimensions = await ipcRenderer.invoke("get-dimensions", signal.file, type)
+        setContainers((prev) => {
+            const newState = [...prev]
+            newState.splice(index + 1, 0, {id: signal.id, started: false, jsx: <FileContainer key={signal.id} id={signal.id} height={dimensions.height} width={dimensions.width} framerate={dimensions.framerate} source={signal.file} type={type} setStart={setStarted} remove={removeContainer}/>})
+            return newState
+        })
+    }
 
     const startAllFunc = () => {
         setContainers((prev) => {
@@ -97,7 +119,7 @@ const FileContainerList: React.FunctionComponent = (props) => {
     }
 
     return (
-        <Reorder reorderId="file-containers" component="ul" holdTime={200} onReorder={reorder}>{
+        <Reorder reorderId="file-containers" component="ul" holdTime={50} onReorder={reorder}>{
             containers.map((c) => (
                 <li key={c.id}>
                     {c.jsx}

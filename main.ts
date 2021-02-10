@@ -182,8 +182,12 @@ ipcMain.handle("add-files", (event, files: string[], identifers: number[]) => {
   window?.webContents.send("add-files", files, identifers)
 })
 
-ipcMain.handle("add-file", (event, file: string) => {
-  window?.webContents.send("add-file", file)
+ipcMain.handle("add-file-id", (event, file: string, pos: number, id: number) => {
+    window?.webContents.send("add-file-id", file, pos, id)
+})
+
+ipcMain.handle("add-file", (event, file: string, pos: number) => {
+    window?.webContents.send("add-file", file, pos)
 })
 
 ipcMain.handle("select-files", async () => {

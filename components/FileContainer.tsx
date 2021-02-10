@@ -33,6 +33,10 @@ interface FileContainerProps {
     framerate?: number
 }
 
+let realEvent = true
+let mouseStopped = false
+let timer = null as any
+
 const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileContainerProps) => {
     const {directory} = useContext(DirectoryContext)
     const {scale} = useContext(ScaleContext)
@@ -98,15 +102,22 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         const clearAll = () => {
             setClearSignal(true)
         }
+        const checkMouseStop = () => {
+            mouseStopped = false
+            clearTimeout(timer)
+            timer =  setTimeout(() => {mouseStopped = true}, 140)
+        }
         ipcRenderer.on("conversion-progress", conversionProgress)
         ipcRenderer.on("conversion-finished", conversionFinished)
         ipcRenderer.on("start-all", startAll)
         ipcRenderer.on("clear-all", clearAll)
+        window.addEventListener("mousemove", checkMouseStop)
         return () => {
             ipcRenderer.removeListener("conversion-progress", conversionProgress)
             ipcRenderer.removeListener("conversion-finished", conversionFinished)
             ipcRenderer.removeListener("start-all", startAll)
             ipcRenderer.removeListener("clear-all", clearAll)
+            window.removeEventListener("mousemove", checkMouseStop)
         }
     }, [])
 
@@ -217,7 +228,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
 
     const preview = (event: React.MouseEvent<HTMLElement>) => {
         const source = showNew ? output : props.source
-        if (event.ctrlKey) return ipcRenderer.invoke("add-file", source)
+        if (event.ctrlKey) return ipcRenderer.invoke("add-file", source, props.id)
         if (!drag) ipcRenderer.invoke("preview", source, props.type)
     }
 
@@ -225,11 +236,27 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         if (output) setShowNew((prev) => !prev)
     }
 
+    const delayPress = (event: React.MouseEvent<HTMLElement>) => {
+        console.log(mouseStopped)
+        setDrag(false)
+        const {target, nativeEvent} = event
+        const cloned =  new MouseEvent("mousedown", nativeEvent)
+        if (!realEvent || !mouseStopped) {
+            realEvent = true
+            return
+        }
+        event.stopPropagation()
+        setTimeout(() => {
+            realEvent = false
+            target.dispatchEvent(cloned)
+        }, 200)
+    }
+
     return (
         <section ref={fileContainerRef} className="file-wrap-container" onMouseOver={() => setHover(true)} onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
             <div className="file-container" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} onMouseDown={() => setDrag(false)} onMouseMove={() => setDrag(true)}>
             <div className="file-img-container">
-                {props.type === "video" ? <video className="file-img" onMouseUp={preview} muted autoPlay loop><source src={showNew ? output : props.source}></source></video> : <img className="file-img" onMouseUp={preview} src={showNew ? output : props.source}/>}
+                {props.type === "video" ? <video className="file-img" onMouseDown={delayPress} onMouseUp={preview} muted autoPlay loop><source src={showNew ? output : props.source}></source></video> : <img className="file-img" onMouseDown={delayPress} onMouseUp={preview} src={showNew ? output : props.source}/>}
             </div>
             <div className="file-middle">
                 <div className="file-group-top">

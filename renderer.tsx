@@ -12,6 +12,7 @@ import Preview from "./components/Preview"
 import TitleBar from "./components/TitleBar"
 import VersionDialog from "./components/VersionDialog"
 import "./index.less"
+import functions from "./structures/functions"
 
 export const DirectoryContext = React.createContext<any>(null)
 export const NoiseContext = React.createContext<any>(null)
@@ -59,6 +60,13 @@ const App = () => {
   const [blockSize, setBlockSize] = useState(1024)
   const [threads, setThreads] = useState(4)
   const [rename, setRename] = useState("2x")
+
+  useEffect(() => {
+    window.addEventListener("mousemove", functions.autoScroll)
+    return () => {
+      window.removeEventListener("mousemove", functions.autoScroll)
+    }
+  }, [])
 
   return (
     <main className="app">

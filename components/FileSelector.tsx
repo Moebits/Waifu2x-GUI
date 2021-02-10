@@ -13,9 +13,9 @@ const FileSelector: React.FunctionComponent = (props) => {
     const [id, setID] = useState(1)
 
     useEffect(() => {
-        const addFile = (event: any, file: string) => {
+        const addFile = (event: any, file: string, pos: number) => {
             setID((prev) => {
-                ipcRenderer.invoke("add-files", [file], [prev])
+                ipcRenderer.invoke("add-file-id", file, pos, prev)
                 return prev + 1
             })
         }
