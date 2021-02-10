@@ -17,8 +17,8 @@ import stopButton from "../assets/stopButton.png"
 import trashButtonHover from "../assets/trashButton-hover.png"
 import trashButton from "../assets/trashButton.png"
 import {BlockSizeContext, DirectoryContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFCumulativeContext,
-GIFQualityContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext,
-PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext} from "../renderer"
+GIFQualityContext, GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext,
+ParallelFramesContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext} from "../renderer"
 import functions from "../structures/functions"
 import "../styles/filecontainer.less"
 
@@ -57,6 +57,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const {blockSize} = useContext(BlockSizeContext)
     const {threads} = useContext(ThreadsContext)
     const {rename} = useContext(RenameContext)
+    const {gifTransparency} = useContext(GIFTransparencyContext)
     const [hover, setHover] = useState(false)
     const [hoverClose, setHoverClose] = useState(false)
     const [hoverLocation, setHoverLocation] = useState(false)
@@ -132,7 +133,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         if (started) return
         const fps = originalFramerate ? props.framerate : framerate
         const quality = props.type === "gif" ? gifQuality : videoQuality
-        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, scale, noise, mode, speed, reverse, quality, rename, gifCumulative, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads})
+        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, scale, noise, mode, speed, reverse, quality, rename, gifCumulative, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, gifTransparency})
         setLockedStats({framerate: fps, noise, scale, mode, speed, reverse})
         setStarted(true)
         props.setStart(props.id)
@@ -237,7 +238,6 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     }
 
     const delayPress = (event: React.MouseEvent<HTMLElement>) => {
-        console.log(mouseStopped)
         setDrag(false)
         const {target, nativeEvent} = event
         const cloned =  new MouseEvent("mousedown", nativeEvent)

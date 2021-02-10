@@ -36,6 +36,7 @@ export const ForceOpenCLContext = React.createContext<any>(null)
 export const BlockSizeContext = React.createContext<any>(null)
 export const ThreadsContext = React.createContext<any>(null)
 export const RenameContext = React.createContext<any>(null)
+export const GIFTransparencyContext = React.createContext<any>(null)
 
 const App = () => {
   const [directory, setDirectory] = useState("")
@@ -60,6 +61,7 @@ const App = () => {
   const [blockSize, setBlockSize] = useState(1024)
   const [threads, setThreads] = useState(4)
   const [rename, setRename] = useState("2x")
+  const [gifTransparency, setGIFTransparency] = useState(true)
 
   useEffect(() => {
     window.addEventListener("mousemove", functions.autoScroll)
@@ -70,6 +72,7 @@ const App = () => {
 
   return (
     <main className="app">
+      <GIFTransparencyContext.Provider value={{gifTransparency, setGIFTransparency}}>
       <OriginalFramerateContext.Provider value={{originalFramerate, setOriginalFramerate}}>
       <RenameContext.Provider value={{rename, setRename}}>
       <ThreadsContext.Provider value={{threads, setThreads}}>
@@ -122,6 +125,7 @@ const App = () => {
       </ThreadsContext.Provider>
       </RenameContext.Provider>
       </OriginalFramerateContext.Provider>
+      </GIFTransparencyContext.Provider>
     </main>
   )
 }
