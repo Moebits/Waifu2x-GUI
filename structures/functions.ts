@@ -69,7 +69,7 @@ export default class Functions {
         let newDest = dest
         while (fs.existsSync(newDest) || duplicate) {
             newDest = `${path.dirname(dest)}\\${path.basename(dest, path.extname(dest))}_${i}${path.extname(dest)}`
-            duplicate = active.find((a) => a.dest === dest)
+            duplicate = active.find((a) => a.dest === newDest)
             i++
         }
         return newDest
