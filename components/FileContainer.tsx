@@ -216,8 +216,8 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     }
 
     const preview = (event: React.MouseEvent<HTMLElement>) => {
-        if (event.ctrlKey) return ipcRenderer.invoke("add-file", props.source)
         const source = showNew ? output : props.source
+        if (event.ctrlKey) return ipcRenderer.invoke("add-file", source)
         if (!drag) ipcRenderer.invoke("preview", source, props.type)
     }
 
