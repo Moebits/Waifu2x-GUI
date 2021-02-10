@@ -114,7 +114,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         updateProgressColor()
         updateBackgroundColor()
         if (!started && startSignal) startConversion()
-        if (clearSignal) closeConversion()
+        if (!started && clearSignal) closeConversion()
     })
 
     const startConversion = () => {

@@ -74,7 +74,13 @@ ipcMain.handle("delete-conversion", async (event, id: number) => {
       if (fs.existsSync(dest)) fs.unlinkSync(dest)
     } else {
       const frameDest = `${path.dirname(source)}/${path.basename(source, path.extname(source))}Frames`
-      if (fs.existsSync(frameDest)) functions.removeDirectory(frameDest)
+      const match = dest.match(/_\d+(?=\.)/)?.[0]
+      if (match) {
+        const newFrameDest = `${path.dirname(source)}/${path.basename(source, path.extname(source))}Frames${match}`
+        fs.existsSync(newFrameDest) ? functions.removeDirectory(newFrameDest) : (fs.existsSync(frameDest) ? functions.removeDirectory(frameDest) : null)
+      } else {
+        if (fs.existsSync(frameDest)) functions.removeDirectory(frameDest)
+      }
       let counter = 1
       let error = true
       while (error && counter < 20) {
@@ -146,14 +152,17 @@ ipcMain.handle("upscale", async (event, info: any) => {
       if (action === "stop") return true
     }
   }
-  active.push({id: info.id, source: info.source, dest: waifu2x.parseDest(info.source, info.dest, options), type: info.type, action: null})
+  let dest = waifu2x.parseDest(info.source, info.dest, options)
+  const duplicate = active.find((a) => a.dest === dest)
+  if (fs.existsSync(dest) || duplicate) dest = functions.newDest(dest, active)
+  active.push({id: info.id, source: info.source, dest, type: info.type, action: null})
   let output = ""
   if (info.type === "image") {
-    output = await waifu2x.upscaleImage(info.source, info.dest, options, action)
+    output = await waifu2x.upscaleImage(info.source, dest, options, action)
   } else if (info.type === "gif") {
-    output = await waifu2x.upscaleGIF(info.source, info.dest, options, progress)
+    output = await waifu2x.upscaleGIF(info.source, dest, options, progress)
   } else if (info.type === "video") {
-    output = await waifu2x.upscaleVideo(info.source, info.dest, options, progress)
+    output = await waifu2x.upscaleVideo(info.source, dest, options, progress)
   }
   window?.webContents.send("conversion-finished", {id: info.id, output})
 })

@@ -62,4 +62,16 @@ export default class Functions {
             document.querySelector(".logo-bar-drag")?.style["-webkit-app-region"] = "no-drag"
         }
     }
+
+    public static newDest = (dest: string, active: any[]) => {
+        let duplicate = active.find((a) => a.dest === dest)
+        let i = 1
+        let newDest = dest
+        while (fs.existsSync(newDest) || duplicate) {
+            newDest = `${path.dirname(dest)}\\${path.basename(dest, path.extname(dest))}_${i}${path.extname(dest)}`
+            duplicate = active.find((a) => a.dest === dest)
+            i++
+        }
+        return newDest
+    }
 }

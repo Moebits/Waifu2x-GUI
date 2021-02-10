@@ -35,8 +35,7 @@ const FileContainerList: React.FunctionComponent = (props) => {
     }, [])
 
     useEffect(() => {
-        updateStartAll()
-        updateClearAll()
+        update()
     })
 
     const startAllFunc = () => {
@@ -50,7 +49,7 @@ const FileContainerList: React.FunctionComponent = (props) => {
         setStartAll(false)
     }
 
-    const updateStartAll = () => {
+    const update = () => {
         let found = false
         for (let i = 0; i < containers.length; i++) {
             if (containers[i].started === false) {
@@ -59,16 +58,16 @@ const FileContainerList: React.FunctionComponent = (props) => {
             }
         }
         setStartAll(found)
+        setClearAll(found)
     }
 
     const clearAllFunc = () => {
-        setContainers([])
-        setStartAll(false)
-    }
-
-    const updateClearAll = () => {
-        const found = containers.length ? true : false
-        setClearAll(found)
+        setContainers((prev) => {
+            let newState = [...prev]
+            newState = newState.filter((s) => s.started)
+            return newState
+        })
+        setClearAll(false)
     }
 
     const removeContainer = (id: number) => {
