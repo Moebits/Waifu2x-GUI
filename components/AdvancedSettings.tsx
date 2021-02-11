@@ -4,7 +4,7 @@ import checkboxChecked from "../assets/checkbox2-checked.png"
 import checkbox from "../assets/checkbox2.png"
 import {BlockSizeContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFCumulativeContext, GIFQualityContext,
 GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext,
-PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext} from "../renderer"
+PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext} from "../renderer"
 import functions from "../structures/functions"
 import "../styles/advancedsettings.less"
 
@@ -22,6 +22,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     const {blockSize, setBlockSize} = useContext(BlockSizeContext)
     const {threads, setThreads} = useContext(ThreadsContext)
     const {rename, setRename} = useContext(RenameContext)
+    const {pitch, setPitch} = useContext(PitchContext)
     const {noise, setNoise} = useContext(NoiseContext)
     const {scale, setScale} = useContext(ScaleContext)
     const {speed, setSpeed} = useContext(SpeedContext)
@@ -68,11 +69,12 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
             setSpeed(settings.speed)
             setReverse(settings.reverse)
             setMode(settings.mode)
+            setPitch(settings.pitch)
         }
     }
 
     useEffect(() => {
-        ipcRenderer.invoke("store-settings", {framerate, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, gifCumulative, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads})
+        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, gifCumulative, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads})
         functions.logoDrag(!visible)
     })
 
@@ -101,6 +103,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setSpeed(1)
         setReverse(false)
         setMode("noise-scale")
+        setPitch(true)
     }
 
     const changeRename = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,6 +192,10 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                             <input className="settings-input" type="text" spellCheck="false" value={framerate} onChange={changeFramerate}/>
                             <p className="settings-text">Original?</p>
                             <img src={originalFramerate ? checkboxChecked : checkbox} onClick={() => setOriginalFramerate((prev: boolean) => !prev)} className="settings-checkbox"/>
+                        </div>
+                        <div className="settings-row">
+                            <p className="settings-text">Pitch Audio? </p>
+                            <img src={pitch ? checkboxChecked : checkbox} onClick={() => setPitch((prev: boolean) => !prev)} className="settings-checkbox"/>
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">Video Quality: </p>

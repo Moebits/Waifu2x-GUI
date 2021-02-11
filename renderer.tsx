@@ -37,6 +37,7 @@ export const BlockSizeContext = React.createContext<any>(null)
 export const ThreadsContext = React.createContext<any>(null)
 export const RenameContext = React.createContext<any>(null)
 export const GIFTransparencyContext = React.createContext<any>(null)
+export const PitchContext = React.createContext<any>(null)
 
 const App = () => {
   const [directory, setDirectory] = useState("")
@@ -62,6 +63,7 @@ const App = () => {
   const [threads, setThreads] = useState(4)
   const [rename, setRename] = useState("2x")
   const [gifTransparency, setGIFTransparency] = useState(true)
+  const [pitch, setPitch] = useState(true)
 
   useEffect(() => {
     window.addEventListener("mousemove", functions.autoScroll)
@@ -72,6 +74,7 @@ const App = () => {
 
   return (
     <main className="app">
+      <PitchContext.Provider value={{pitch, setPitch}}>
       <GIFTransparencyContext.Provider value={{gifTransparency, setGIFTransparency}}>
       <OriginalFramerateContext.Provider value={{originalFramerate, setOriginalFramerate}}>
       <RenameContext.Provider value={{rename, setRename}}>
@@ -126,6 +129,7 @@ const App = () => {
       </RenameContext.Provider>
       </OriginalFramerateContext.Provider>
       </GIFTransparencyContext.Provider>
+      </PitchContext.Provider>
     </main>
   )
 }

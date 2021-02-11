@@ -135,6 +135,7 @@ ipcMain.handle("upscale", async (event, info: any) => {
     blockSize: Number(info.blockSize),
     parallelFrames: Number(info.parallelFrames),
     transparency: info.gifTransparency,
+    pitch: info.pitch,
     ffmpegPath,
     waifu2xPath
   }
