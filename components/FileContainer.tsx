@@ -68,7 +68,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const [started, setStarted] = useState(false)
     const [stopped, setStopped] = useState(false)
     const [deleted, setDeleted] = useState(false)
-    const [progress, setProgress] = useState(0)
+    const [progress, setProgress] = useState(null) as any
     const [frames, setFrames] = useState("")
     const [progressColor, setProgressColor] = useState("")
     const [backgroundColor, setBackgroundColor] = useState("")
@@ -190,7 +190,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
             jsx = <p className="file-text-progress black">{props.type !== "image" ? "Processing..." : "Upscaling..."}</p>
             progressJSX = <ProgressBar ref={progressBarRef} animated now={100}/>
         }
-        if (progress) {
+        if (progress !== null) {
             jsx = <p className="file-text-progress">Upscaling... {progress.toFixed(2)}%</p>
             progressJSX = <ProgressBar ref={progressBarRef} animated now={progress}/>
         }

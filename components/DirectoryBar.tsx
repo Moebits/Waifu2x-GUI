@@ -1,4 +1,5 @@
-import {ipcRenderer} from "electron"
+import {ipcRenderer, remote} from "electron"
+import fs from "fs"
 import React, {useContext, useEffect, useState} from "react"
 import folderButtonHover from "../assets/folderButton-hover.png"
 import folderButton from "../assets/folderButton.png"
@@ -38,11 +39,16 @@ const DirectoryBar: React.FunctionComponent = (props) => {
         }
     }
 
+    const openDirectory = () => {
+        if (!fs.existsSync(directory)) fs.mkdirSync(directory, {recursive: true})
+        remote.shell.openPath(directory)
+    }
+
     return (
         <section className="directory-bar">
             <div className="directory-bar-center">
                 <img className="directory-bar-img" width="25" height="25" src={folderHover ? folderButtonHover : folderButton} onMouseEnter={() => setFolderHover(true)} onMouseLeave={() => setFolderHover(false)} onClick={changeDirectory}/>
-                <input className="directory-bar-box" type="text" value={directory} onChange={updateDirectory}/>
+                <input className="directory-bar-box" type="text" value={directory} onDoubleClick={openDirectory} onChange={updateDirectory}/>
             </div>
         </section>
     )

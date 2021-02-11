@@ -91,7 +91,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setGIFQuality(10)
         setPNGCompression(3)
         setJPGQuality(100)
-        setParallelFrames(1)
+        setParallelFrames(2)
         setDisableGPU(false)
         setForceOpenCL(false)
         setBlockSize(1024)

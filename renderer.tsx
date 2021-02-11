@@ -55,7 +55,7 @@ const App = () => {
   const [gifCumulative, setGIFCumulative] = useState(true)
   const [pngCompression, setPNGCompression] = useState(3)
   const [jpgQuality, setJPGQuality] = useState(100)
-  const [parallelFrames, setParallelFrames] = useState(1)
+  const [parallelFrames, setParallelFrames] = useState(2)
   const [disableGPU, setDisableGPU] = useState(false)
   const [forceOpenCL, setForceOpenCL] = useState(false)
   const [blockSize, setBlockSize] = useState(1024)
