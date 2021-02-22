@@ -38,6 +38,7 @@ export const ThreadsContext = React.createContext<any>(null)
 export const RenameContext = React.createContext<any>(null)
 export const GIFTransparencyContext = React.createContext<any>(null)
 export const PitchContext = React.createContext<any>(null)
+export const PreviewContext = React.createContext<any>(null)
 
 const App = () => {
   const [directory, setDirectory] = useState("")
@@ -65,6 +66,8 @@ const App = () => {
   const [gifTransparency, setGIFTransparency] = useState(true)
   const [pitch, setPitch] = useState(true)
 
+  const [previewVisible, setPreviewVisible] = useState(false)
+
   useEffect(() => {
     window.addEventListener("mousemove", functions.autoScroll)
     return () => {
@@ -74,6 +77,7 @@ const App = () => {
 
   return (
     <main className="app">
+      <PreviewContext.Provider value={{previewVisible, setPreviewVisible}}>
       <PitchContext.Provider value={{pitch, setPitch}}>
       <GIFTransparencyContext.Provider value={{gifTransparency, setGIFTransparency}}>
       <OriginalFramerateContext.Provider value={{originalFramerate, setOriginalFramerate}}>
@@ -130,6 +134,7 @@ const App = () => {
       </OriginalFramerateContext.Provider>
       </GIFTransparencyContext.Provider>
       </PitchContext.Provider>
+      </PreviewContext.Provider>
     </main>
   )
 }

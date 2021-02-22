@@ -17,8 +17,8 @@ import stopButton from "../assets/stopButton.png"
 import trashButtonHover from "../assets/trashButton-hover.png"
 import trashButton from "../assets/trashButton.png"
 import {BlockSizeContext, DirectoryContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFCumulativeContext,
-GIFQualityContext, GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext,
-ParallelFramesContext, PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext} from "../renderer"
+GIFQualityContext, GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext,
+PitchContext, PNGCompressionContext, PreviewContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext} from "../renderer"
 import functions from "../structures/functions"
 import "../styles/filecontainer.less"
 
@@ -59,6 +59,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const {rename} = useContext(RenameContext)
     const {pitch} = useContext(PitchContext)
     const {gifTransparency} = useContext(GIFTransparencyContext)
+    const {previewVisible} = useContext(PreviewContext)
     const [hover, setHover] = useState(false)
     const [hoverClose, setHoverClose] = useState(false)
     const [hoverLocation, setHoverLocation] = useState(false)
@@ -107,7 +108,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         const checkMouseStop = () => {
             mouseStopped = false
             clearTimeout(timer)
-            timer =  setTimeout(() => {mouseStopped = true}, 140)
+            timer =  setTimeout(() => {mouseStopped = true}, 50)
         }
         ipcRenderer.on("conversion-progress", conversionProgress)
         ipcRenderer.on("conversion-finished", conversionFinished)
@@ -239,7 +240,8 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     }
 
     const delayPress = (event: React.MouseEvent<HTMLElement>) => {
-        setDrag(false)
+        setDrag(previewVisible)
+        return event.stopPropagation()
         const {target, nativeEvent} = event
         const cloned =  new MouseEvent("mousedown", nativeEvent)
         if (!realEvent || !mouseStopped) {

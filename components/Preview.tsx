@@ -1,13 +1,14 @@
 import {ipcRenderer} from "electron"
-import React, {useEffect, useState} from "react"
+import React, {useContext, useEffect, useState} from "react"
 import logo from "../assets/logo.png"
+import {PreviewContext} from "../renderer"
 import functions from "../structures/functions"
 import "../styles/preview.less"
 
 const Preview: React.FunctionComponent = (props) => {
     const [src, setSrc] = useState("")
     const [type, setType] = useState("image")
-    const [visible, setVisible] = useState(false)
+    const {previewVisible, setPreviewVisible} = useContext(PreviewContext)
 
     useEffect(() => {
         const preview = (event: any, image: string, type: "image" | "gif" | "video") => {
@@ -15,21 +16,23 @@ const Preview: React.FunctionComponent = (props) => {
                 functions.logoDrag(false)
                 setSrc(image)
                 setType(type)
-                setVisible(true)
+                setPreviewVisible(true)
             }
         }
+        window.addEventListener("click", close)
         ipcRenderer.on("preview", preview)
         return () => {
             ipcRenderer.removeListener("preview", preview)
+            window.removeEventListener("click", close)
         }
     }, [])
 
     const close = () => {
         functions.logoDrag(true)
-        setVisible(false)
+        setPreviewVisible(false)
     }
 
-    if (visible) {
+    if (previewVisible) {
         return (
             <section className="preview-container" onClick={close}>
                 <div className="preview-box">
