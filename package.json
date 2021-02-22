@@ -1,6 +1,6 @@
 {
   "name": "waifu2x-gui",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A gui app that upscales anime-styled images with waifu2x",
   "main": "dist/main.js",
   "scripts": {
