@@ -119,7 +119,7 @@ const FileContainerList: React.FunctionComponent = (props) => {
     }
 
     return (
-        <Reorder reorderId="file-containers" component="ul" autoScroll={false} holdTime={50} onReorder={reorder}>{
+        <Reorder reorderId="file-containers" component="ul" holdTime={50} onReorder={reorder}>{
             containers.map((c) => (
                 <li key={c.id}>
                     {c.jsx}

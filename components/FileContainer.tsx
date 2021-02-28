@@ -108,7 +108,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         const checkMouseStop = () => {
             mouseStopped = false
             clearTimeout(timer)
-            timer =  setTimeout(() => {mouseStopped = true}, 50)
+            timer =  setTimeout(() => {mouseStopped = true}, 200)
         }
         ipcRenderer.on("conversion-progress", conversionProgress)
         ipcRenderer.on("conversion-finished", conversionFinished)
@@ -232,7 +232,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const preview = (event: React.MouseEvent<HTMLElement>) => {
         const source = showNew ? output : props.source
         if (event.ctrlKey) return ipcRenderer.invoke("add-file", source, props.id)
-        if (!drag) ipcRenderer.invoke("preview", source, props.type)
+        if (event.button === 2 && !drag) ipcRenderer.invoke("preview", source, props.type)
     }
 
     const toggleNew = () => {
@@ -241,7 +241,11 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
 
     const delayPress = (event: React.MouseEvent<HTMLElement>) => {
         setDrag(previewVisible)
-        return event.stopPropagation()
+        if (event.button === 2) {
+            return event.stopPropagation()
+        } else {
+            return
+        }
         const {target, nativeEvent} = event
         const cloned =  new MouseEvent("mousedown", nativeEvent)
         if (!realEvent || !mouseStopped) {
