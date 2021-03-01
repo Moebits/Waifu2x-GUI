@@ -119,12 +119,43 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setFramerate(value)
     }
 
+    const changeFramerateKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowUp") {
+            setFramerate((prev: any) => {
+                if (Number(prev) + 1 > 9999) return Number(prev)
+                if (String(prev).includes(".")) return (Number(prev) + 1).toFixed(functions.countDecimals(Number(prev), 2))
+                return Number(prev) + 1
+            })
+        } else if (event.key === "ArrowDown") {
+            setFramerate((prev: any) => {
+                if (Number(prev) - 1 < 0) return Number(prev)
+                if (String(prev).includes(".")) return (Number(prev) - 1).toFixed(functions.countDecimals(Number(prev), 2))
+                return Number(prev) - 1
+            })
+        }
+    }
+
     const changeVideoQuality = (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.value
         if (value.includes(".")) return
+        if (value.length > 2) return
         if (Number.isNaN(Number(value))) return
         if (Number(value) > 51) value = "51"
         setVideoQuality(value)
+    }
+
+    const changeVideoQualityKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowUp") {
+            setVideoQuality((prev: any) => {
+                if (Number(prev) + 1 > 51) return Number(prev)
+                return Number(prev) + 1
+            })
+        } else if (event.key === "ArrowDown") {
+            setVideoQuality((prev: any) => {
+                if (Number(prev) - 1 < 0) return Number(prev)
+                return Number(prev) - 1
+            })
+        }
     }
 
     const changeGIFQuality = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,20 +166,64 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setGIFQuality(value)
     }
 
+    const changeGIFQualityKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowUp") {
+            setGIFQuality((prev: any) => {
+                if (Number(prev) + 1 > 999) return Number(prev)
+                return Number(prev) + 1
+            })
+        } else if (event.key === "ArrowDown") {
+            setGIFQuality((prev: any) => {
+                if (Number(prev) - 1 < 0) return Number(prev)
+                return Number(prev) - 1
+            })
+        }
+    }
+
     const changePNGCompression = (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.value
         if (value.includes(".")) return
+        if (value.length > 1) return
         if (Number.isNaN(Number(value))) return
         if (Number(value) > 9) value = "9"
         setPNGCompression(value)
     }
 
+    const changePNGCompressionKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowUp") {
+            setPNGCompression((prev: any) => {
+                if (Number(prev) + 1 > 9) return Number(prev)
+                return Number(prev) + 1
+            })
+        } else if (event.key === "ArrowDown") {
+            setPNGCompression((prev: any) => {
+                if (Number(prev) - 1 < 0) return Number(prev)
+                return Number(prev) - 1
+            })
+        }
+    }
+
     const changeJPGQuality = (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.value
         if (value.includes(".")) return
+        if (value.length > 3) return
         if (Number.isNaN(Number(value))) return
         if (Number(value) > 101) value = "101"
         setJPGQuality(value)
+    }
+
+    const changeJPGQualityKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowUp") {
+            setJPGQuality((prev: any) => {
+                if (Number(prev) + 1 > 101) return Number(prev)
+                return Number(prev) + 1
+            })
+        } else if (event.key === "ArrowDown") {
+            setJPGQuality((prev: any) => {
+                if (Number(prev) - 1 < 0) return Number(prev)
+                return Number(prev) - 1
+            })
+        }
     }
 
     const changeParallelFrames = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,6 +234,20 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setParallelFrames(value)
     }
 
+    const changeParallelFramesKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowUp") {
+            setParallelFrames((prev: any) => {
+                if (Number(prev) + 1 > 999) return Number(prev)
+                return Number(prev) + 1
+            })
+        } else if (event.key === "ArrowDown") {
+            setParallelFrames((prev: any) => {
+                if (Number(prev) - 1 < 0) return Number(prev)
+                return Number(prev) - 1
+            })
+        }
+    }
+
     const changeBlockSize = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         if (value.includes(".")) return
@@ -167,12 +256,41 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setBlockSize(value)
     }
 
+    const changeBlockSizeKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowUp") {
+            setBlockSize((prev: any) => {
+                if (Number(prev) * 2 > 9999) return Number(prev)
+                if (Number(prev) === 0) return 1
+                return Number(prev) * 2
+            })
+        } else if (event.key === "ArrowDown") {
+            setBlockSize((prev: any) => {
+                if (Number(prev) === 1) return 0
+                return Math.round(Number(prev) / 2)
+            })
+        }
+    }
+
     const changeThreads = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         if (value.includes(".")) return
         if (value.length > 2) return
         if (Number.isNaN(Number(value))) return
         setThreads(value)
+    }
+
+    const changeThreadsKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowUp") {
+            setThreads((prev: any) => {
+                if (Number(prev) + 1 > 99) return Number(prev)
+                return Number(prev) + 1
+            })
+        } else if (event.key === "ArrowDown") {
+            setThreads((prev: any) => {
+                if (Number(prev) - 1 < 0) return Number(prev)
+                return Number(prev) - 1
+            })
+        }
     }
 
     if (visible) {
@@ -189,7 +307,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">Framerate: </p>
-                            <input className="settings-input" type="text" spellCheck="false" value={framerate} onChange={changeFramerate}/>
+                            <input className="settings-input" type="text" spellCheck="false" value={framerate} onChange={changeFramerate} onKeyDown={changeFramerateKey}/>
                             <p className="settings-text">Original?</p>
                             <img src={originalFramerate ? checkboxChecked : checkbox} onClick={() => setOriginalFramerate((prev: boolean) => !prev)} className="settings-checkbox"/>
                         </div>
@@ -199,7 +317,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">Video Quality: </p>
-                            <input className="settings-input" type="text" spellCheck="false" value={videoQuality} onChange={changeVideoQuality}/>
+                            <input className="settings-input" type="text" spellCheck="false" value={videoQuality} onChange={changeVideoQuality} onKeyDown={changeVideoQualityKey}/>
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">GIF Transparency? </p>
@@ -211,19 +329,19 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">GIF Quality: </p>
-                            <input className="settings-input" type="text" spellCheck="false" value={gifQuality} onChange={changeGIFQuality}/>
+                            <input className="settings-input" type="text" spellCheck="false" value={gifQuality} onChange={changeGIFQuality} onKeyDown={changeGIFQualityKey}/>
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">PNG Compression: </p>
-                            <input className="settings-input" type="text" spellCheck="false" value={pngCompression} onChange={changePNGCompression}/>
+                            <input className="settings-input" type="text" spellCheck="false" value={pngCompression} onChange={changePNGCompression} onKeyDown={changePNGCompressionKey}/>
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">JPG/WEBP Quality: </p>
-                            <input className="settings-input" type="text" spellCheck="false" value={jpgQuality} onChange={changeJPGQuality}/>
+                            <input className="settings-input" type="text" spellCheck="false" value={jpgQuality} onChange={changeJPGQuality} onKeyDown={changeJPGQualityKey}/>
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">Parallel Frames: </p>
-                            <input className="settings-input" type="text" spellCheck="false" value={parallelFrames} onChange={changeParallelFrames}/>
+                            <input className="settings-input" type="text" spellCheck="false" value={parallelFrames} onChange={changeParallelFrames} onKeyDown={changeParallelFramesKey}/>
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">Disable GPU? </p>
@@ -235,11 +353,11 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">Block Size: </p>
-                            <input className="settings-input" type="text" spellCheck="false" value={blockSize} onChange={changeBlockSize}/>
+                            <input className="settings-input" type="text" spellCheck="false" value={blockSize} onChange={changeBlockSize} onKeyDown={changeBlockSizeKey}/>
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">Threads: </p>
-                            <input className="settings-input" type="text" spellCheck="false" value={threads} onChange={changeThreads}/>
+                            <input className="settings-input" type="text" spellCheck="false" value={threads} onChange={changeThreads} onKeyDown={changeThreadsKey}/>
                         </div>
                         <div className="settings-button-container">
                          <button onClick={revert} className="revert-button">Revert</button>

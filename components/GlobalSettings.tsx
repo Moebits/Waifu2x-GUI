@@ -25,6 +25,20 @@ const DirectoryBar: React.FunctionComponent = (props) => {
         setNoise(value.replace(".", ""))
     }
 
+    const handleNoiseKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowUp") {
+            setNoise((prev: any) => {
+                if (Number(prev) + 1 > 3) return Number(prev)
+                return Number(prev) + 1
+            })
+        } else if (event.key === "ArrowDown") {
+            setNoise((prev: any) => {
+                if (Number(prev) - 1 < 0) return Number(prev)
+                return Number(prev) - 1
+            })
+        }
+    }
+
     const handleScale = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         if (value.replace(".", "").length > 2) return
@@ -32,11 +46,43 @@ const DirectoryBar: React.FunctionComponent = (props) => {
         setScale(value)
     }
 
+    const handleScaleKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowUp") {
+            setScale((prev: any) => {
+                if (Number(prev) + 1 > 99) return Number(prev)
+                if (String(prev).includes(".")) return (Number(prev) + 1).toFixed(1)
+                return Number(prev) + 1
+            })
+        } else if (event.key === "ArrowDown") {
+            setScale((prev: any) => {
+                if (Number(prev) - 1 < 0) return Number(prev)
+                if (String(prev).includes(".")) return (Number(prev) - 1).toFixed(1)
+                return Number(prev) - 1
+            })
+        }
+    }
+
     const handleSpeed = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         if (value.replace(".", "").length > 2) return
         if (Number.isNaN(Number(value))) return
         setSpeed(value)
+    }
+
+    const handleSpeedKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowUp") {
+            setSpeed((prev: any) => {
+                if (Number(prev) + 1 > 99) return Number(prev)
+                if (String(prev).includes(".")) return (Number(prev) + 1).toFixed(1)
+                return Number(prev) + 1
+            })
+        } else if (event.key === "ArrowDown") {
+            setSpeed((prev: any) => {
+                if (Number(prev) - 1 < 0) return Number(prev)
+                if (String(prev).includes(".")) return (Number(prev) - 1).toFixed(1)
+                return Number(prev) - 1
+            })
+        }
     }
 
     const handleReverse = () => {
@@ -47,11 +93,11 @@ const DirectoryBar: React.FunctionComponent = (props) => {
         <section className="global-settings">
             <div className="global-settings-box">
                 <p className="global-settings-text">Noise: </p>
-                <input className="global-settings-input" type="text" min="0" max="3" value={noise} onChange={handleNoise}/>
+                <input className="global-settings-input" type="text" min="0" max="3" value={noise} onChange={handleNoise} onKeyDown={handleNoiseKey}/>
             </div>
             <div className="global-settings-box">
                 <p className="global-settings-text">Scale: </p>
-                <input className="global-settings-input" type="text" value={scale} onChange={handleScale}/>
+                <input className="global-settings-input" type="text" value={scale} onChange={handleScale} onKeyDown={handleScaleKey}/>
             </div>
             <div className="global-settings-box">
                 <p className="global-settings-text">Mode: </p>
@@ -63,7 +109,7 @@ const DirectoryBar: React.FunctionComponent = (props) => {
             </div>
             <div className="global-settings-box">
                 <p className="global-settings-text">Speed: </p>
-                <input className="global-settings-input" type="text" min="0.5" max="100" value={speed} onChange={handleSpeed}/>
+                <input className="global-settings-input" type="text" min="0.5" max="100" value={speed} onChange={handleSpeed} onKeyDown={handleSpeedKey}/>
             </div>
             <div className="global-settings-box">
                 <p className="global-settings-text">Reverse: </p>

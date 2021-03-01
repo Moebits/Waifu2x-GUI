@@ -86,6 +86,12 @@ export default class Functions {
         return newDest
     }
 
+    public static countDecimals = (value: number, max?: number) => {
+        const count = value % 1 ? value.toString().split(".")[1].length : 0
+        if (max && count > max) return max
+        return count
+    }
+
     public static autoScroll = (event: MouseEvent) => {
         if (!mouseDown) return
         const edgeSize = 100
