@@ -1,5 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css"
-import React, {useEffect, useState} from "react"
+import React, {useState} from "react"
 import ReactDom from "react-dom"
 import AdvancedSettings from "./components/AdvancedSettings"
 import DirectoryBar from "./components/DirectoryBar"
@@ -12,7 +12,6 @@ import Preview from "./components/Preview"
 import TitleBar from "./components/TitleBar"
 import VersionDialog from "./components/VersionDialog"
 import "./index.less"
-import functions from "./structures/functions"
 
 export const DirectoryContext = React.createContext<any>(null)
 export const NoiseContext = React.createContext<any>(null)
@@ -67,13 +66,6 @@ const App = () => {
   const [pitch, setPitch] = useState(true)
 
   const [previewVisible, setPreviewVisible] = useState(false)
-
-  useEffect(() => {
-    window.addEventListener("mousemove", functions.autoScroll)
-    return () => {
-      window.removeEventListener("mousemove", functions.autoScroll)
-    }
-  }, [])
 
   return (
     <main className="app">
