@@ -21,6 +21,8 @@ Warning: Upscaling too many images in parallel can cause your computer to freeze
 
 To install, just download the latest exe installer from the [releases](https://github.com/Tenpi/Waifu2x-GUI/releases) tab. You may get a warning message that says "running this app can harm your PC", but don't worry because it's safe. Updates can be installed automatically.
 
+Note: If you install it under `C:/Program Files` you might need to run it as administrator.
+
 ### Bugs and Requests
 
 Open an issue on my GitHub repository. I appreciate any requests, but I can't guarantee that I will fulfill all of them.
