@@ -147,7 +147,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     }
 
     const deleteConversion = async () => {
-        const success = await ipcRenderer.invoke("delete-conversion", props.id)
+        const success = await ipcRenderer.invoke("delete-conversion", props.id, true)
         if (success) setDeleted(true)
     }
 

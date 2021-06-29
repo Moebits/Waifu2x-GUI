@@ -64,7 +64,7 @@ ipcMain.handle("open-location", async (event, location: string) => {
   }
 })
 
-ipcMain.handle("delete-conversion", async (event, id: number) => {
+ipcMain.handle("delete-conversion", async (event, id: number, frames: boolean) => {
   const index = active.findIndex((a) => a.id === id)
   if (index !== -1) {
     active[index].action = "stop"
@@ -73,15 +73,16 @@ ipcMain.handle("delete-conversion", async (event, id: number) => {
     if (active[index].type === "image") {
       if (fs.existsSync(dest)) fs.unlinkSync(dest)
     } else {
-      /*
-      const frameDest = `${path.dirname(source)}/${path.basename(source, path.extname(source))}Frames`
-      const match = dest.match(/_\d+(?=\.)/)?.[0]
-      if (match) {
-        const newFrameDest = `${path.dirname(source)}/${path.basename(source, path.extname(source))}Frames${match}`
-        fs.existsSync(newFrameDest) ? functions.removeDirectory(newFrameDest) : (fs.existsSync(frameDest) ? functions.removeDirectory(frameDest) : null)
-      } else {
-        if (fs.existsSync(frameDest)) functions.removeDirectory(frameDest)
-      }*/
+      if (frames) {
+        const frameDest = `${path.dirname(source)}/${path.basename(source, path.extname(source))}Frames`
+        const match = dest.match(/_\d+(?=\.)/)?.[0]
+        if (match) {
+          const newFrameDest = `${path.dirname(source)}/${path.basename(source, path.extname(source))}Frames${match}`
+          fs.existsSync(newFrameDest) ? functions.removeDirectory(newFrameDest) : (fs.existsSync(frameDest) ? functions.removeDirectory(frameDest) : null)
+        } else {
+          if (fs.existsSync(frameDest)) functions.removeDirectory(frameDest)
+        }
+      }
       let counter = 1
       let error = true
       while (error && counter < 20) {

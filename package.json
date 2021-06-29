@@ -1,6 +1,6 @@
 {
   "name": "waifu2x-gui",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "A gui app that upscales anime-styled images with waifu2x",
   "main": "dist/main.js",
   "scripts": {
@@ -88,6 +88,6 @@
     "react-dropzone": "^11.3.0",
     "react-reorder": "^3.0.0-alpha.7",
     "shade-blend-color": "^1.0.0",
-    "waifu2x": "^0.8.0"
+    "waifu2x": "^0.8.2"
   }
 }
