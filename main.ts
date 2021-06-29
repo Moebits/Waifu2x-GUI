@@ -160,12 +160,16 @@ ipcMain.handle("upscale", async (event, info: any) => {
   if (fs.existsSync(dest) || duplicate) dest = functions.newDest(dest, active)
   active.push({id: info.id, source: info.source, dest, type: info.type, action: null})
   let output = ""
-  if (info.type === "image") {
-    output = await waifu2x.upscaleImage(info.source, dest, options, action)
-  } else if (info.type === "gif") {
-    output = await waifu2x.upscaleGIF(info.source, dest, options, progress)
-  } else if (info.type === "video") {
-    output = await waifu2x.upscaleVideo(info.source, dest, options, progress)
+  try {
+    if (info.type === "image") {
+      output = await waifu2x.upscaleImage(info.source, dest, options, action)
+    } else if (info.type === "gif") {
+      output = await waifu2x.upscaleGIF(info.source, dest, options, progress)
+    } else if (info.type === "video") {
+      output = await waifu2x.upscaleVideo(info.source, dest, options, progress)
+    }
+  } catch {
+    output = dest
   }
   window?.webContents.send("conversion-finished", {id: info.id, output})
 })
