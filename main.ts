@@ -255,9 +255,11 @@ if (!singleLock) {
     window.on("closed", () => {
       window = null
     })
-    globalShortcut.register("Control+Shift+I", () => {
-      window?.webContents.toggleDevTools()
-    })
+    if (process.env.DEVELOPMENT === "true") {
+      globalShortcut.register("Control+Shift+I", () => {
+        window?.webContents.toggleDevTools()
+      })
+    }
   })
 }
 
