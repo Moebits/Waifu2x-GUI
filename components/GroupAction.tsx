@@ -44,7 +44,7 @@ const GroupAction: React.FunctionComponent = (props) => {
                 if (startHover) {
                     return startAllButtonHover
                 } else {
-                    return startAllButtonHover
+                    return startAllButton
                 }
             } else {
                 if (startHover) {
