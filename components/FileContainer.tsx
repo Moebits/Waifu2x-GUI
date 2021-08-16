@@ -1,6 +1,6 @@
 import {ipcRenderer, remote, shell} from "electron"
 import path from "path"
-import React, {useContext, useEffect, useRef, useState} from "react"
+import React, {useContext, useEffect, useRef, useState, useReducer} from "react"
 import {ProgressBar} from "react-bootstrap"
 import pSBC from "shade-blend-color"
 import arrow from "../assets/arrow.png"
@@ -80,6 +80,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const [clearSignal, setClearSignal] = useState(false)
     const [drag, setDrag] = useState(false)
     const [showNew, setShowNew] = useState(false)
+    const [ignored, forceUpdate] = useReducer(x => x + 1, 0)
     const progressBarRef = useRef(null) as React.RefObject<HTMLDivElement>
     const fileContainerRef = useRef(null) as React.RefObject<HTMLElement>
 
@@ -114,12 +115,14 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         ipcRenderer.on("conversion-finished", conversionFinished)
         ipcRenderer.on("start-all", startAll)
         ipcRenderer.on("clear-all", clearAll)
+        ipcRenderer.on("update-color", forceUpdate)
         window.addEventListener("mousemove", checkMouseStop)
         return () => {
             ipcRenderer.removeListener("conversion-progress", conversionProgress)
             ipcRenderer.removeListener("conversion-finished", conversionFinished)
             ipcRenderer.removeListener("start-all", startAll)
             ipcRenderer.removeListener("clear-all", clearAll)
+            ipcRenderer.removeListener("update-color", forceUpdate)
             window.removeEventListener("mousemove", checkMouseStop)
         }
     }, [])
@@ -161,15 +164,30 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         ipcRenderer.invoke("open-location", output)
     }
 
-    const updateBackgroundColor = () => {
+    const updateBackgroundColor = async () => {
         const colors = ["#2c9bf6", "#4d7fff", "#4f5eff", "#3b7cff", "#2b92ff", "#47a6ff"]
         const container = fileContainerRef.current?.querySelector(".file-container") as HTMLElement
+        if (!container) return
         if (!backgroundColor) {
             const color = colors[Math.floor(Math.random() * colors.length)]
             setBackgroundColor(color)
         }
-        container.style.backgroundColor = backgroundColor
-        container.style.border = `4px solid ${pSBC(0.1, backgroundColor)}`
+        const theme = await ipcRenderer.invoke("get-theme")
+        if (theme === "light") {
+            const text = fileContainerRef.current?.querySelectorAll(".file-text, .file-text-alt") as NodeListOf<HTMLElement>
+            text.forEach((t) => {
+                t.style.color = "black"
+            })
+            container.style.backgroundColor = backgroundColor
+            container.style.border = `4px solid ${pSBC(0.1, backgroundColor)}`
+        } else {
+            const text = fileContainerRef.current?.querySelectorAll(".file-text, .file-text-alt") as NodeListOf<HTMLElement>
+            text.forEach((t) => {
+                t.style.color = backgroundColor
+            })
+            container.style.backgroundColor = "#090409"
+            container.style.border = `4px solid #090409`
+        }
     }
 
     const updateProgressColor = () => {

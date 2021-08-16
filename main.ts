@@ -21,6 +21,10 @@ const store = new Store()
 
 const active: Array<{id: number, source: string, dest: string, type: "image" | "gif" | "video", action: null | "stop"}> = []
 
+ipcMain.handle("update-color", (event, color: string) => {
+  window?.webContents.send("update-color", color)
+})
+
 ipcMain.handle("preview", (event, image: string, type: string) => {
   window?.webContents.send("preview", image, type)
 })
@@ -37,6 +41,14 @@ ipcMain.handle("store-settings", (event, settings) => {
 ipcMain.handle("advanced-settings", () => {
   window?.webContents.send("close-all-dialogs", "settings")
   window?.webContents.send("show-settings-dialog")
+})
+
+ipcMain.handle("get-theme", () => {
+  return store.get("theme", "light")
+})
+
+ipcMain.handle("save-theme", (event, theme: string) => {
+  store.set("theme", theme)
 })
 
 ipcMain.handle("install-update", async (event) => {

@@ -14,7 +14,10 @@ import starButton from "../assets/starButton.png"
 import updateButtonHover from "../assets/updateButton-hover.png"
 import updateButton from "../assets/updateButton.png"
 import pack from "../package.json"
-import functions from "../structures/functions"
+import lightButton from "../assets/light.png"
+import lightButtonHover from "../assets/light-hover.png"
+import darkButton from "../assets/dark.png"
+import darkButtonHover from "../assets/dark-hover.png"
 import "../styles/titlebar.less"
 
 const TitleBar: React.FunctionComponent = (props) => {
@@ -24,10 +27,17 @@ const TitleBar: React.FunctionComponent = (props) => {
     const [hoverMax, setHoverMax] = useState(false)
     const [hoverReload, setHoverReload] = useState(false)
     const [hoverStar, setHoverStar] = useState(false)
+    const [hoverTheme, setHoverTheme] = useState(false)
+    const [theme, setTheme] = useState("light")
     const [hoverSettings, setHoverSettings] = useState(false)
 
     useEffect(() => {
         ipcRenderer.invoke("check-for-updates", true)
+        const initTheme = async () => {
+            const saved = await ipcRenderer.invoke("get-theme")
+            changeTheme(saved)
+        }
+        initTheme()
     }, [])
 
     const minimize = () => {
@@ -56,6 +66,53 @@ const TitleBar: React.FunctionComponent = (props) => {
         ipcRenderer.invoke("advanced-settings", false)
     }
 
+    const changeTheme = (value?: string) => {
+        let condition = value !== undefined ? value === "dark" : theme === "light"
+        if (condition) {
+            document.documentElement.style.setProperty("--bg-color", "#090409")
+            document.documentElement.style.setProperty("--title-color", "#090409")
+            document.documentElement.style.setProperty("--text-color", "#4d84d9")
+            document.documentElement.style.setProperty("--dir-color", "#090409")
+            document.documentElement.style.setProperty("--dir-text", "#4985b4")
+            document.documentElement.style.setProperty("--settings-color", "#090409")
+            document.documentElement.style.setProperty("--settings-text", "#673efa")
+            document.documentElement.style.setProperty("--settings-revert", "#090409")
+            document.documentElement.style.setProperty("--settings-revert-text", "#563bf0")
+            document.documentElement.style.setProperty("--settings-ok", "#090409")
+            document.documentElement.style.setProperty("--settings-ok-text", "#355aff")
+            document.documentElement.style.setProperty("--version-color", "#090409")
+            document.documentElement.style.setProperty("--version-text", "#3a5eff")
+            document.documentElement.style.setProperty("--version-accept", "#090409")
+            document.documentElement.style.setProperty("--version-accept-text", "#5142ff")
+            document.documentElement.style.setProperty("--version-reject", "#090409")
+            document.documentElement.style.setProperty("--version-reject-text", "#463bbe")
+            setTheme("dark")
+            ipcRenderer.invoke("save-theme", "dark")
+            ipcRenderer.invoke("update-color", "dark")
+        } else {
+            document.documentElement.style.setProperty("--bg-color", "#5ea8da")
+            document.documentElement.style.setProperty("--title-color", "#4d84d9")
+            document.documentElement.style.setProperty("--text-color", "black")
+            document.documentElement.style.setProperty("--dir-color", "#4985b4")
+            document.documentElement.style.setProperty("--dir-text", "black")
+            document.documentElement.style.setProperty("--settings-color", "#673efa")
+            document.documentElement.style.setProperty("--settings-text", "black")
+            document.documentElement.style.setProperty("--settings-revert", "#563bf0")
+            document.documentElement.style.setProperty("--settings-revert-text", "black")
+            document.documentElement.style.setProperty("--settings-ok", "#355aff")
+            document.documentElement.style.setProperty("--settings-ok-text", "black")
+            document.documentElement.style.setProperty("--version-color", "#3a5eff")
+            document.documentElement.style.setProperty("--version-text", "black")
+            document.documentElement.style.setProperty("--version-accept", "#5142ff")
+            document.documentElement.style.setProperty("--version-accept-text", "black")
+            document.documentElement.style.setProperty("--version-reject", "#463bbe")
+            document.documentElement.style.setProperty("--version-reject-text", "black")
+            setTheme("light")
+            ipcRenderer.invoke("save-theme", "light")
+            ipcRenderer.invoke("update-color", "light")
+        }
+    }
+
     return (
         <section className="title-bar">
                 <div className="title-bar-drag-area">
@@ -64,6 +121,7 @@ const TitleBar: React.FunctionComponent = (props) => {
                         <p><span className="title">Waifu2x GUI v{pack.version}</span></p>
                     </div>
                     <div className="title-bar-buttons">
+                    <img src={hoverTheme ? (theme === "light" ? darkButtonHover : lightButtonHover) : (theme === "light" ? darkButton : lightButton)} height="20" width="20" className="title-bar-button theme-button" onClick={() => changeTheme()} onMouseEnter={() => setHoverTheme(true)} onMouseLeave={() => setHoverTheme(false)}/>
                         <img src={hoverSettings ? settingsButtonHover : settingsButton} height="20" width="20" className="title-bar-button settings-button" onClick={settings} onMouseEnter={() => setHoverSettings(true)} onMouseLeave={() => setHoverSettings(false)}/>
                         <img src={hoverStar ? starButtonHover : starButton} height="20" width="20" className="title-bar-button star-button" onClick={star} onMouseEnter={() => setHoverStar(true)} onMouseLeave={() => setHoverStar(false)}/>
                         <img src={hoverReload ? updateButtonHover : updateButton} height="20" width="20" className="title-bar-button update-button" onClick={update} onMouseEnter={() => setHoverReload(true)} onMouseLeave={() => setHoverReload(false)}/>

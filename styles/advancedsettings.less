@@ -21,7 +21,7 @@
     width: 60%;
     height: 80%;
     border-radius: 10px;
-    background-color: #673efa;
+    background-color: var(--settings-color);
     padding: 10px;
     display: flex;
     flex-direction: column;
@@ -49,7 +49,7 @@
 }
 
 .settings-title {
-    color: black;
+    color: var(--settings-text);
     font-size: 20px;
     font-family: "Maven Pro", sans-serif;
     user-select: text;
@@ -69,7 +69,7 @@
 .settings-text {
     user-select: text;
     cursor: text;
-    color: black;
+    color: var(--settings-text);
     font-family: "Yusei Magic", sans-serif;
     font-size: 15px;
     &::selection {
@@ -78,7 +78,7 @@
 }
 
 .settings-input {
-    color: black;
+    color: var(--settings-text);
     border: none;
     margin-left: 10px;
     width: 50px;
@@ -112,11 +112,11 @@
     padding-bottom: 4px;
     padding-left: 14px;
     padding-right: 14px;
-    color: black;
+    color: var(--settings-revert-text);
     font-size: 20px;
     font-family: "Maven Pro", sans-serif;
-    background-color: #563bf0;
-    border: 3px solid black;
+    background-color: var(--settings-revert);
+    border: 3px solid var(--settings-revert-text);
     &:hover {
         color: white;
         border: 3px solid white;
@@ -130,11 +130,11 @@
     padding-bottom: 4px;
     padding-left: 14px;
     padding-right: 14px;
-    color: black;
+    color: var(--settings-ok-text);
     font-size: 20px;
     font-family: "Maven Pro", sans-serif;
-    background-color: #355aff;
-    border: 3px solid black;
+    background-color: var(--settings-ok);
+    border: 3px solid var(--settings-ok-text);
     &:hover {
         color: white;
         border: 3px solid white;

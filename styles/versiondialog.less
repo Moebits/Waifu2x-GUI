@@ -21,7 +21,7 @@
     width: 40%;
     height: 30%;
     border-radius: 10px;
-    background-color: #3a5eff;
+    background-color: var(--version-color);
     padding: 10px;
     display: flex;
     flex-direction: column;
@@ -37,7 +37,7 @@
 }
 
 .version-dialog-text {
-    color: black;
+    color: var(--version-text);
     cursor: text;
     user-select: text;
     font-size: 20px;
@@ -59,11 +59,11 @@
     padding-bottom: 7px;
     padding-left: 14px;
     padding-right: 14px;
-    color: black;
+    color: var(--version-reject-text);
     font-size: 20px;
     font-family: "Maven Pro", sans-serif;
-    background-color: #463bbe;
-    border: 3px solid black;
+    background-color: var(--version-reject);
+    border: 3px solid var(--version-reject-text);
     &:hover {
         color: white;
         border: 3px solid white;
@@ -77,11 +77,11 @@
     padding-bottom: 7px;
     padding-left: 14px;
     padding-right: 14px;
-    color: black;
+    color: var(--version-accept-text);
     font-size: 20px;
     font-family: "Maven Pro", sans-serif;
-    background-color: #5142ff;
-    border: 3px solid black;
+    background-color: var(--version-accept);
+    border: 3px solid var(--version-accept-text);
     &:hover {
         color: white;
         border: 3px solid white;
