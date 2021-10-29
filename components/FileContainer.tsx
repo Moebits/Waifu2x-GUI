@@ -3,6 +3,7 @@ import path from "path"
 import React, {useContext, useEffect, useRef, useState, useReducer} from "react"
 import {ProgressBar} from "react-bootstrap"
 import pSBC from "shade-blend-color"
+import fs from "fs"
 import arrow from "../assets/arrow.png"
 import closeContainerHover from "../assets/closeContainer-hover.png"
 import closeContainer from "../assets/closeContainer.png"
@@ -85,6 +86,12 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const fileContainerRef = useRef(null) as React.RefObject<HTMLElement>
 
     useEffect(() => {
+        const conversionStarted = (event: any, info: {id: number}) => {
+            if (info.id === props.id) {
+                setStarted(true)
+                props.setStart(props.id)
+            }
+        }
         const conversionProgress = (event: any, info: {id: number, current: number, total: number}) => {
             if (info.id === props.id) {
                 const newProgress = (info.current / info.total) * 100
@@ -111,6 +118,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
             clearTimeout(timer)
             timer =  setTimeout(() => {mouseStopped = true}, 200)
         }
+        ipcRenderer.on("conversion-started", conversionStarted)
         ipcRenderer.on("conversion-progress", conversionProgress)
         ipcRenderer.on("conversion-finished", conversionFinished)
         ipcRenderer.on("start-all", startAll)
@@ -118,6 +126,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         ipcRenderer.on("update-color", forceUpdate)
         window.addEventListener("mousemove", checkMouseStop)
         return () => {
+            ipcRenderer.removeListener("conversion-started", conversionStarted)
             ipcRenderer.removeListener("conversion-progress", conversionProgress)
             ipcRenderer.removeListener("conversion-finished", conversionFinished)
             ipcRenderer.removeListener("start-all", startAll)
@@ -130,38 +139,46 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     useEffect(() => {
         updateProgressColor()
         updateBackgroundColor()
-        if (!started && startSignal) startConversion()
-        if (!started && clearSignal) closeConversion()
+        if (!started && startSignal) startConversion(true)
+        if ((!started || output) && clearSignal) closeConversion()
     })
 
-    const startConversion = () => {
+    const startConversion = (startAll?: boolean) => {
         if (started) return
+        setStartSignal(false)
         const fps = originalFramerate ? props.framerate : framerate
         const quality = props.type === "gif" ? gifQuality : videoQuality
-        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, pitch, scale, noise, mode, speed, reverse, quality, rename, gifCumulative, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, gifTransparency})
+        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, pitch, scale, noise, mode, speed, reverse, quality, rename, gifCumulative, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, gifTransparency}, startAll)
         setLockedStats({framerate: fps, noise, scale, mode, speed, reverse})
-        setStarted(true)
-        props.setStart(props.id)
+        if (!startAll) {
+            setStarted(true)
+            props.setStart(props.id)
+        }
     }
 
     const closeConversion = () => {
+        ipcRenderer.invoke("move-queue", props.id)
         if (!output) ipcRenderer.invoke("delete-conversion", props.id)
         props.remove(props.id)
     }
 
     const deleteConversion = async () => {
+        if (deleted) return
         const success = await ipcRenderer.invoke("delete-conversion", props.id, true)
-        if (success) setDeleted(true)
+        if (success) {
+            ipcRenderer.invoke("move-queue")
+            setDeleted(true)
+        }
     }
 
     const stopConversion = async () => {
+        if (stopped) return
         if (output || progress >= 99) return
         const success = await ipcRenderer.invoke("stop-conversion", props.id)
-        if (success) setStopped(true)
-    }
-
-    const openLocation =  () => {
-        ipcRenderer.invoke("open-location", output)
+        if (success) {
+            ipcRenderer.invoke("move-queue")
+            setStopped(true)
+        }
     }
 
     const updateBackgroundColor = async () => {
@@ -277,6 +294,16 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         }, 200)
     }
 
+    const openLocation = (direct?: boolean) => {
+        const location = showNew ? output : props.source
+        if (!fs.existsSync(location)) return
+        if (direct) {
+            remote.shell.openPath(path.normalize(location))
+        } else {
+            remote.shell.showItemInFolder(path.normalize(location))
+        }
+    }
+
     return (
         <section ref={fileContainerRef} className="file-wrap-container" onMouseOver={() => setHover(true)} onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
             <div className="file-container" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} onMouseDown={() => setDrag(false)} onMouseMove={() => setDrag(true)}>
@@ -286,7 +313,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
             <div className="file-middle">
                 <div className="file-group-top">
                     <div className="file-name">
-                        <p className="file-text bigger"><span className="hover" onClick={() => remote.shell.showItemInFolder(path.normalize(props.source))}>{functions.cleanTitle(path.basename(props.source))}</span></p>
+                        <p className="file-text bigger"><span className="hover" onClick={() => openLocation(true)}>{functions.cleanTitle(path.basename(props.source))}</span></p>
                         <img className="file-expand" onMouseDown={(event) => event.stopPropagation()} width="20" height="20" onClick={toggleNew} src={showNew ? contract : expand}/>
                     </div>
                     <div className="file-info">
@@ -320,10 +347,10 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
             <div className="file-buttons">
                 {hover ? <img className="file-button close-container" width="28" height="28" onMouseDown={(event) => event.stopPropagation()} src={hoverClose ? closeContainerHover : closeContainer} onClick={closeConversion} onMouseEnter={() => setHoverClose(true)} onMouseLeave={() => setHoverClose(false)}/> : null}
                 <div className="file-button-row">
-                    <img className="file-button start-button" width="129" height="36" onMouseDown={(event) => event.stopPropagation()} onClick={started ? stopConversion : startConversion} src={started ? (hoverStop ? stopButtonHover : stopButton) : (hoverStart ? startButtonHover : startButton)} onMouseEnter={() => {setHoverStart(true); setHoverStop(true)}} onMouseLeave={() => {setHoverStart(false); setHoverStop(false)}}/>
+                    <img className="file-button start-button" width="129" height="36" onMouseDown={(event) => event.stopPropagation()} onClick={() => {started ? stopConversion() : startConversion()}} src={started ? (hoverStop ? stopButtonHover : stopButton) : (hoverStart ? startButtonHover : startButton)} onMouseEnter={() => {setHoverStart(true); setHoverStop(true)}} onMouseLeave={() => {setHoverStart(false); setHoverStop(false)}}/>
                 </div>
                 <div className="file-button-row">
-                    {output ? <img className="file-button" width="50" height="50" onMouseDown={(event) => event.stopPropagation()} src={hoverLocation ? locationButtonHover : locationButton} onClick={openLocation} onMouseEnter={() => setHoverLocation(true)} onMouseLeave={() => setHoverLocation(false)}/> : null}
+                    {output ? <img className="file-button" width="50" height="50" onMouseDown={(event) => event.stopPropagation()} src={hoverLocation ? locationButtonHover : locationButton} onClick={() => openLocation()} onMouseEnter={() => setHoverLocation(true)} onMouseLeave={() => setHoverLocation(false)}/> : null}
                     {output ? <img className="file-button" width="50" height="50" onMouseDown={(event) => event.stopPropagation()} src={hoverTrash ? trashButtonHover : trashButton} onClick={deleteConversion} onMouseEnter={() => setHoverTrash(true)} onMouseLeave={() => setHoverTrash(false)}/> : null}
                 </div>
             </div>

@@ -19,7 +19,9 @@ if (!fs.existsSync(waifu2xPath)) waifu2xPath = path.join(__dirname, "../waifu2x"
 autoUpdater.autoDownload = false
 const store = new Store()
 
+const history: Array<{id: number, source: string, dest: string, type: "image" | "gif" | "video"}> = []
 const active: Array<{id: number, source: string, dest: string, type: "image" | "gif" | "video", action: null | "stop"}> = []
+const queue: Array<{started: boolean, info: any}> = []
 
 ipcMain.handle("update-color", (event, color: string) => {
   window?.webContents.send("update-color", color)
@@ -77,12 +79,25 @@ ipcMain.handle("open-location", async (event, location: string) => {
 })
 
 ipcMain.handle("delete-conversion", async (event, id: number, frames: boolean) => {
-  const index = active.findIndex((a) => a.id === id)
+  let dest = ""
+  let source = ""
+  let type = ""
+  let index = active.findIndex((a) => a.id === id)
   if (index !== -1) {
     active[index].action = "stop"
-    const dest = active[index].dest
-    const source = active[index].source
-    if (active[index].type === "image") {
+    dest = active[index].dest
+    source = active[index].source
+    type = active[index].type
+  } else {
+    index = history.findIndex((a) => a.id === id)
+    if (index !== -1) {
+      dest = history[index].dest
+      source = history[index].source
+      type = history[index].type
+    }
+  }
+  if (dest) {
+    if (type === "image") {
       if (fs.existsSync(dest)) fs.unlinkSync(dest)
     } else {
       if (frames) {
@@ -130,7 +145,27 @@ ipcMain.handle("clear-all", () => {
   window?.webContents.send("clear-all")
 })
 
-ipcMain.handle("upscale", async (event, info: any) => {
+const nextQueue = async (info: any) => {
+  const index = active.findIndex((a) => a.id === info.id)
+  if (index !== -1) active.splice(index, 1)
+  const settings = store.get("settings", {}) as any
+  let qIndex = queue.findIndex((q) => q.info.id === info.id)
+  if (qIndex !== -1) {
+    queue.splice(qIndex, 1)
+    let concurrent = Number(settings?.queue)
+    if (Number.isNaN(concurrent) || concurrent < 1) concurrent = 1
+    if (active.length < concurrent) {
+      const next = queue.find((q) => !q.started)
+      if (next) {
+        await upscale(next.info)
+      }
+    }
+  }
+}
+
+const upscale = async (info: any) => {
+  let qIndex = queue.findIndex((q) => q.info.id === info.id)
+  if (qIndex !== -1) queue[qIndex].started = true
   const options = {
     noise: Number(info.noise) as any,
     scale: Number(info.scale),
@@ -171,7 +206,9 @@ ipcMain.handle("upscale", async (event, info: any) => {
   let dest = waifu2x.parseDest(info.source, info.dest, options)
   const duplicate = active.find((a) => a.dest === dest)
   if (fs.existsSync(dest) || duplicate) dest = functions.newDest(dest, active)
+  history.push({id: info.id, source: info.source, dest, type: info.type})
   active.push({id: info.id, source: info.source, dest, type: info.type, action: null})
+  window?.webContents.send("conversion-started", {id: info.id})
   let output = ""
   try {
     if (info.type === "image") {
@@ -185,6 +222,53 @@ ipcMain.handle("upscale", async (event, info: any) => {
     output = dest
   }
   window?.webContents.send("conversion-finished", {id: info.id, output})
+  nextQueue(info)
+}
+
+ipcMain.handle("upscale", async (event, info: any, startAll: boolean) => {
+  const qIndex = queue.findIndex((q) => q.info.id === info.id)
+  if (qIndex === -1) queue.push({info, started: false})
+  if (startAll) {
+    const settings = store.get("settings", {}) as any
+    let concurrent = Number(settings?.queue)
+    if (Number.isNaN(concurrent) || concurrent < 1) concurrent = 1
+    if (active.length < concurrent) {
+      await upscale(info)
+    }
+  } else {
+    await upscale(info)
+  }
+})
+
+ipcMain.handle("update-concurrency", async (event, concurrent) => {
+  if (Number.isNaN(concurrent) || concurrent < 1) concurrent = 1
+  let counter = active.length
+  while (counter < concurrent) {
+    const next = queue.find((q) => !q.started)
+    if (next) {
+      counter++
+      await upscale(next.info)
+    } else {
+      break
+    }
+  }
+})
+
+
+ipcMain.handle("move-queue", async (event, id: number) => {
+  const settings = store.get("settings", {}) as any
+  let concurrent = Number(settings?.queue)
+  if (Number.isNaN(concurrent) || concurrent < 1) concurrent = 1
+  if (id) {
+    let qIndex = queue.findIndex((q) => q.info.id === id)
+    if (qIndex !== -1) queue.splice(qIndex, 1)
+  }
+  if (active.length < concurrent) {
+    const next = queue.find((q) => !q.started)
+    if (next) {
+      await upscale(next.info)
+    }
+  }
 })
 
 ipcMain.handle("get-dimensions", async (event, path: string, type: string) => {

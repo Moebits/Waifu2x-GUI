@@ -2,13 +2,12 @@ import {ipcRenderer} from "electron"
 import fs from "fs"
 import React, {useContext, useEffect, useState} from "react"
 import Reorder from "react-reorder"
-import {ClearAllContext, StartAllContext} from "../renderer"
+import {ClearAllContext} from "../renderer"
 import functions from "../structures/functions"
 import "../styles/filecontainerlist.less"
 import FileContainer from "./FileContainer"
 
 const FileContainerList: React.FunctionComponent = (props) => {
-    const {startAll, setStartAll} = useContext(StartAllContext)
     const {clearAll, setClearAll} = useContext(ClearAllContext)
     const [containers, setContainers] = useState([] as  Array<{id: number, started: boolean, jsx: any}>)
     const [addSignal, setAddSignal] = useState(null) as any
@@ -30,13 +29,9 @@ const FileContainerList: React.FunctionComponent = (props) => {
         }
         ipcRenderer.on("add-files", addFiles)
         ipcRenderer.on("add-file-id", addFile)
-        ipcRenderer.on("start-all", startAllFunc)
-        ipcRenderer.on("clear-all", clearAllFunc)
         return () => {
             ipcRenderer.removeListener("add-files", addFiles)
             ipcRenderer.removeListener("add-file-id", addFile)
-            ipcRenderer.removeListener("start-all", startAllFunc)
-            ipcRenderer.removeListener("clear-all", clearAllFunc)
         }
     }, [])
 
@@ -60,36 +55,9 @@ const FileContainerList: React.FunctionComponent = (props) => {
         })
     }
 
-    const startAllFunc = () => {
-        setContainers((prev) => {
-            const newState = [...prev]
-            for (let i = 0; i < newState.length; i++) {
-                newState[i].started = true
-            }
-            return newState
-        })
-        setStartAll(false)
-    }
-
     const update = () => {
-        let found = false
-        for (let i = 0; i < containers.length; i++) {
-            if (containers[i].started === false) {
-                found = true
-                break
-            }
-        }
-        setStartAll(found)
+        let found = containers.length ? true : false
         setClearAll(found)
-    }
-
-    const clearAllFunc = () => {
-        setContainers((prev) => {
-            let newState = [...prev]
-            newState = newState.filter((s) => s.started)
-            return newState
-        })
-        setClearAll(false)
     }
 
     const removeContainer = (id: number) => {

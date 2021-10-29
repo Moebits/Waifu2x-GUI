@@ -19,7 +19,6 @@ export const ScaleContext = React.createContext<any>(null)
 export const ModeContext = React.createContext<any>(null)
 export const SpeedContext = React.createContext<any>(null)
 export const ReverseContext = React.createContext<any>(null)
-export const StartAllContext = React.createContext<any>(null)
 export const ClearAllContext = React.createContext<any>(null)
 
 export const OriginalFramerateContext = React.createContext<any>(null)
@@ -38,6 +37,7 @@ export const RenameContext = React.createContext<any>(null)
 export const GIFTransparencyContext = React.createContext<any>(null)
 export const PitchContext = React.createContext<any>(null)
 export const PreviewContext = React.createContext<any>(null)
+export const QueueContext = React.createContext<any>(null)
 
 const App = () => {
   const [directory, setDirectory] = useState("")
@@ -46,7 +46,6 @@ const App = () => {
   const [mode, setMode] = useState("noise-scale")
   const [speed, setSpeed] = useState(1)
   const [reverse, setReverse] = useState(false)
-  const [startAll, setStartAll] = useState(false)
   const [clearAll, setClearAll] = useState(false)
 
   const [originalFramerate, setOriginalFramerate] = useState(true)
@@ -64,11 +63,13 @@ const App = () => {
   const [rename, setRename] = useState("2x")
   const [gifTransparency, setGIFTransparency] = useState(true)
   const [pitch, setPitch] = useState(true)
+  const [queue, setQueue] = useState(1)
 
   const [previewVisible, setPreviewVisible] = useState(false)
 
   return (
     <main className="app">
+      <QueueContext.Provider value={{queue, setQueue}}>
       <PreviewContext.Provider value={{previewVisible, setPreviewVisible}}>
       <PitchContext.Provider value={{pitch, setPitch}}>
       <GIFTransparencyContext.Provider value={{gifTransparency, setGIFTransparency}}>
@@ -85,7 +86,6 @@ const App = () => {
       <GIFCumulativeContext.Provider value={{gifCumulative, setGIFCumulative}}>
       <VideoQualityContext.Provider value={{videoQuality, setVideoQuality}}>
       <FramerateContext.Provider value ={{framerate, setFramerate}}>
-      <StartAllContext.Provider value={{startAll, setStartAll}}>
       <ClearAllContext.Provider value={{clearAll, setClearAll}}>
       <DirectoryContext.Provider value={{directory, setDirectory}}>
       <NoiseContext.Provider value={{noise, setNoise}}>
@@ -110,7 +110,6 @@ const App = () => {
       </NoiseContext.Provider>
       </DirectoryContext.Provider>
       </ClearAllContext.Provider>
-      </StartAllContext.Provider>
       </FramerateContext.Provider>
       </VideoQualityContext.Provider>
       </GIFCumulativeContext.Provider>
@@ -127,6 +126,7 @@ const App = () => {
       </GIFTransparencyContext.Provider>
       </PitchContext.Provider>
       </PreviewContext.Provider>
+      </QueueContext.Provider>
     </main>
   )
 }

@@ -8,11 +8,10 @@ import clearAllButtonDarkHover from "../assets/clearAll-hover-dark.png"
 import clearAllButtonDark from "../assets/clearAll-dark.png"
 import startAllButtonDarkHover from "../assets/startAll-hover-dark.png"
 import startAllButtonDark from "../assets/startAll-dark.png"
-import {ClearAllContext, StartAllContext} from "../renderer"
+import {ClearAllContext} from "../renderer"
 import "../styles/groupaction.less"
 
 const GroupAction: React.FunctionComponent = (props) => {
-    const {startAll, setStartAll} = useContext(StartAllContext)
     const {clearAll, setClearAll} = useContext(ClearAllContext)
     const [startHover, setStartHover] = useState(false)
     const [clearHover, setClearHover] = useState(false)
@@ -73,7 +72,7 @@ const GroupAction: React.FunctionComponent = (props) => {
     if (clearAll) {
         return (
             <section className="group-action-container">
-                    {startAll ? <img src={getImage("start")} onClick={start} className="group-action-button" width="319" height="61" onMouseEnter={() => setStartHover(true)} onMouseLeave={() => setStartHover(false)}/> : null}
+                    <img src={getImage("start")} onClick={start} className="group-action-button" width="319" height="61" onMouseEnter={() => setStartHover(true)} onMouseLeave={() => setStartHover(false)}/>
                     <img src={getImage("clear")} onClick={clear} className="group-action-button" width="319" height="61" onMouseEnter={() => setClearHover(true)} onMouseLeave={() => setClearHover(false)}/>
             </section>
         )

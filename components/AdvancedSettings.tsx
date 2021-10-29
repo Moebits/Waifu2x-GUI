@@ -4,7 +4,7 @@ import checkboxChecked from "../assets/checkbox2-checked.png"
 import checkbox from "../assets/checkbox2.png"
 import {BlockSizeContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFCumulativeContext, GIFQualityContext,
 GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext,
-PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext} from "../renderer"
+PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext, QueueContext} from "../renderer"
 import functions from "../structures/functions"
 import "../styles/advancedsettings.less"
 
@@ -29,6 +29,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     const {reverse, setReverse} = useContext(ReverseContext)
     const {mode, setMode} = useContext(ModeContext)
     const {gifTransparency, setGIFTransparency} = useContext(GIFTransparencyContext)
+    const {queue, setQueue} = useContext(QueueContext)
     const [visible, setVisible] = useState(false)
 
     useEffect(() => {
@@ -70,11 +71,12 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
             setReverse(settings.reverse)
             setMode(settings.mode)
             setPitch(settings.pitch)
+            setQueue(settings.queue)
         }
     }
 
     useEffect(() => {
-        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, gifCumulative, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads})
+        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, gifCumulative, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, queue})
         functions.logoDrag(!visible)
     })
 
@@ -104,6 +106,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setReverse(false)
         setMode("noise-scale")
         setPitch(true)
+        setQueue(1)
     }
 
     const changeRename = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -293,6 +296,33 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         }
     }
 
+    const changeQueue = (event: React.ChangeEvent<HTMLInputElement>) => {
+        let value = event.target.value
+        if (value.includes(".")) return
+        if (value.length > 3) return
+        if (Number.isNaN(Number(value))) return
+        setQueue(value)
+        ipcRenderer.invoke("update-concurrency", Number(value))
+    }
+
+    const changeQueueKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        let value = queue
+        if (event.key === "ArrowUp") {
+            setQueue((prev: any) => {
+                if (Number(prev) + 1 > 999) return Number(prev)
+                value = Number(prev) + 1
+                return value
+            })
+        } else if (event.key === "ArrowDown") {
+            setQueue((prev: any) => {
+                if (Number(prev) - 1 < 1) return Number(prev)
+                value = Number(prev) - 1
+                return value
+            })
+        }
+        ipcRenderer.invoke("update-concurrency", Number(value))
+    }
+
     if (visible) {
         return (
             <section className="settings-dialog">
@@ -339,6 +369,10 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                             <p className="settings-text">JPG/WEBP Quality: </p>
                             <input className="settings-input" type="text" spellCheck="false" value={jpgQuality} onChange={changeJPGQuality} onKeyDown={changeJPGQualityKey}/>
                         </div>
+                        <div className="settings-row">
+                                <p className="settings-text">Concurrent Upscales: </p>
+                                <input className="settings-input" type="text" spellCheck="false" value={queue} onChange={changeQueue} onKeyDown={changeQueueKey}/>
+                            </div>
                         <div className="settings-row">
                             <p className="settings-text">Parallel Frames: </p>
                             <input className="settings-input" type="text" spellCheck="false" value={parallelFrames} onChange={changeParallelFrames} onKeyDown={changeParallelFramesKey}/>
