@@ -1,4 +1,4 @@
-import {ipcRenderer, remote} from "electron"
+import {ipcRenderer} from "electron"
 import React, {useContext, useEffect, useState} from "react"
 import logo from "../assets/logo.png"
 import {PreviewContext} from "../renderer"

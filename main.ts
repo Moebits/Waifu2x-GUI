@@ -10,9 +10,12 @@ import "./dev-app-update.yml"
 import pack from "./package.json"
 import functions from "./structures/functions"
 
+require("@electron/remote/main").initialize()
 process.setMaxListeners(0)
 let window: Electron.BrowserWindow | null
-let ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg.exe") as any
+let ffmpegPath = undefined as any
+if (process.platform === "darwin") ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg.app")
+if (process.platform === "win32") ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg.exe") 
 let waifu2xPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/waifu2x")
 if (!fs.existsSync(ffmpegPath)) ffmpegPath = undefined
 if (!fs.existsSync(waifu2xPath)) waifu2xPath = path.join(__dirname, "../waifu2x")
@@ -54,8 +57,15 @@ ipcMain.handle("save-theme", (event, theme: string) => {
 })
 
 ipcMain.handle("install-update", async (event) => {
-  await autoUpdater.downloadUpdate()
-  autoUpdater.quitAndInstall()
+  if (process.platform === "darwin") {
+    const update = await autoUpdater.checkForUpdates()
+    const url = `${pack.repository.url}/releases/download/v${update.updateInfo.version}/${update.updateInfo.files[0].url}`
+    shell.openExternal(url)
+    app.quit()
+  } else {
+    await autoUpdater.downloadUpdate()
+    autoUpdater.quitAndInstall()
+  }
 })
 
 ipcMain.handle("check-for-updates", async (event, startup: boolean) => {
@@ -218,7 +228,8 @@ const upscale = async (info: any) => {
     } else if (info.type === "video") {
       output = await waifu2x.upscaleVideo(info.source, dest, options, progress)
     }
-  } catch {
+  } catch (error) {
+    console.log(error)
     output = dest
   }
   window?.webContents.send("conversion-finished", {id: info.id, output})
@@ -345,18 +356,19 @@ if (!singleLock) {
   })
 
   app.on("ready", () => {
-    window = new BrowserWindow({width: 800, height: 600, minWidth: 720, minHeight: 450, frame: false, backgroundColor: "#5ea8da", center: true, webPreferences: {nodeIntegration: true, contextIsolation: false, enableRemoteModule: true}})
+    window = new BrowserWindow({width: 800, height: 600, minWidth: 720, minHeight: 450, frame: false, backgroundColor: "#5ea8da", center: true, webPreferences: {nodeIntegration: true, contextIsolation: false}})
     window.loadFile(path.join(__dirname, "index.html"))
     window.removeMenu()
+    if (ffmpegPath) fs.chmodSync(ffmpegPath, "777")
+    require("@electron/remote/main").enable(window.webContents)
     window.on("closed", () => {
       window = null
     })
     if (process.env.DEVELOPMENT === "true") {
+      if (process.platform === "darwin") fs.chmodSync(`${waifu2xPath}/waifu2x-converter-cpp.app`, "777")
       globalShortcut.register("Control+Shift+I", () => {
         window?.webContents.toggleDevTools()
       })
     }
   })
 }
-
-app.allowRendererProcessReuse = false

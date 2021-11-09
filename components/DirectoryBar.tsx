@@ -1,4 +1,5 @@
-import {ipcRenderer, remote} from "electron"
+import {ipcRenderer} from "electron"
+import {shell} from "@electron/remote"
 import fs from "fs"
 import React, {useContext, useEffect, useState} from "react"
 import folderButtonHover from "../assets/folderButton-hover.png"
@@ -41,7 +42,7 @@ const DirectoryBar: React.FunctionComponent = (props) => {
 
     const openDirectory = () => {
         if (!fs.existsSync(directory)) fs.mkdirSync(directory, {recursive: true})
-        remote.shell.openPath(directory)
+        shell.openPath(directory)
     }
 
     return (

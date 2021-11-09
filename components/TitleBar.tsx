@@ -1,4 +1,5 @@
-import {ipcRenderer, remote} from "electron"
+import {ipcRenderer} from "electron"
+import {getCurrentWindow, shell} from "@electron/remote"
 import React, {useEffect, useState} from "react"
 import closeButtonHover from "../assets/closeButton-hover.png"
 import closeButton from "../assets/closeButton.png"
@@ -41,11 +42,11 @@ const TitleBar: React.FunctionComponent = (props) => {
     }, [])
 
     const minimize = () => {
-        remote.getCurrentWindow().minimize()
+        getCurrentWindow().minimize()
     }
 
     const maximize = () => {
-        const window = remote.getCurrentWindow()
+        const window = getCurrentWindow()
         if (window.isMaximized()) {
             window.unmaximize()
         } else {
@@ -53,10 +54,10 @@ const TitleBar: React.FunctionComponent = (props) => {
         }
     }
     const close = () => {
-        remote.getCurrentWindow().close()
+        getCurrentWindow().close()
     }
     const star = () => {
-        remote.shell.openExternal(pack.repository.url)
+        shell.openExternal(pack.repository.url)
     }
     const update = () => {
         ipcRenderer.invoke("check-for-updates", false)

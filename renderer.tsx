@@ -1,5 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css"
-import React, {useState} from "react"
+import {ipcRenderer} from "electron"
+import React, {useEffect, useState} from "react"
 import ReactDom from "react-dom"
 import AdvancedSettings from "./components/AdvancedSettings"
 import DirectoryBar from "./components/DirectoryBar"
