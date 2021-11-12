@@ -3,3 +3,5 @@ build
 node_modules
 .env
 waifu2x
+.DS_Store
+ffmpeg/.DS_Store

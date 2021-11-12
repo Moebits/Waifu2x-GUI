@@ -113,6 +113,6 @@
     "react-dropzone": "^11.3.0",
     "react-reorder": "^3.0.0-alpha.7",
     "shade-blend-color": "^1.0.0",
-    "waifu2x": "^0.9.1"
+    "waifu2x": "^0.9.2"
   }
 }
