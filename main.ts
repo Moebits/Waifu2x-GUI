@@ -60,7 +60,7 @@ ipcMain.handle("install-update", async (event) => {
   if (process.platform === "darwin") {
     const update = await autoUpdater.checkForUpdates()
     const url = `${pack.repository.url}/releases/download/v${update.updateInfo.version}/${update.updateInfo.files[0].url}`
-    shell.openExternal(url)
+    await shell.openExternal(url)
     app.quit()
   } else {
     await autoUpdater.downloadUpdate()
