@@ -213,9 +213,17 @@ const upscale = async (info: any) => {
       if (action === "stop") return true
     }
   }
+  if (process.platform !== "win32") {
+    info.source = info.source.replace("file://", "")
+  }
+  let overwrite = false
+  if (info.dest.startsWith("{source}")) {
+    if (!options.rename) overwrite = true
+    info.dest = info.dest.replace("{source}", path.dirname(info.source))
+  }
   let dest = waifu2x.parseDest(info.source, info.dest, options)
   const duplicate = active.find((a) => a.dest === dest)
-  if (fs.existsSync(dest) || duplicate) dest = functions.newDest(dest, active)
+  if (!overwrite && (fs.existsSync(dest) || duplicate)) dest = functions.newDest(dest, active)
   history.push({id: info.id, source: info.source, dest, type: info.type})
   active.push({id: info.id, source: info.source, dest, type: info.type, action: null})
   window?.webContents.send("conversion-started", {id: info.id})
