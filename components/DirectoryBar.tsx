@@ -56,7 +56,7 @@ const DirectoryBar: React.FunctionComponent = (props) => {
 
     const sourceAction = () => {
         if (source) {
-            ipcRenderer.invoke("get-downloads-folder").then((f) => {
+            ipcRenderer.invoke("get-downloads-folder", true).then((f) => {
                 f = f.replace(/\\/g, "/")
                 if (!f.endsWith("/")) f = `${f}/`
                 setDefaultDir(f)

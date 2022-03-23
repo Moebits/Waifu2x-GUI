@@ -224,6 +224,7 @@ const upscale = async (info: any) => {
   let dest = waifu2x.parseDest(info.source, info.dest, options)
   const duplicate = active.find((a) => a.dest === dest)
   if (!overwrite && (fs.existsSync(dest) || duplicate)) dest = functions.newDest(dest, active)
+  dest = dest.replace(/\\/g, "/")
   history.push({id: info.id, source: info.source, dest, type: info.type})
   active.push({id: info.id, source: info.source, dest, type: info.type, action: null})
   window?.webContents.send("conversion-started", {id: info.id})
@@ -237,6 +238,7 @@ const upscale = async (info: any) => {
       output = await waifu2x.upscaleVideo(info.source, dest, options, progress)
     }
   } catch (error) {
+    window?.webContents.send("debug", error)
     console.log(error)
     output = dest
   }
@@ -327,8 +329,8 @@ ipcMain.handle("select-files", async () => {
   return files.filePaths
 })
 
-ipcMain.handle("get-downloads-folder", async (event, location: string) => {
-  if (store.has("downloads")) {
+ipcMain.handle("get-downloads-folder", async (event, force: boolean) => {
+  if (store.has("downloads") && !force) {
     return store.get("downloads")
   } else {
     const downloads = app.getPath("downloads")

@@ -68,6 +68,10 @@ const App = () => {
 
   const [previewVisible, setPreviewVisible] = useState(false)
 
+  useEffect(() => {
+    ipcRenderer.on("debug", console.log)
+  }, [])
+
   return (
     <main className="app">
       <QueueContext.Provider value={{queue, setQueue}}>
