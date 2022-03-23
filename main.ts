@@ -238,9 +238,19 @@ const upscale = async (info: any) => {
       output = await waifu2x.upscaleVideo(info.source, dest, options, progress)
     }
   } catch (error) {
-    window?.webContents.send("debug", error)
-    console.log(error)
-    output = dest
+    if (path.extname(info.source) === ".webp") {
+      try {
+        output = await waifu2x.upscaleAnimatedWebp(info.source, dest, options, progress)
+      } catch (error) {
+        window?.webContents.send("debug", error)
+        console.log(error)
+        output = dest
+      }
+    } else {
+      window?.webContents.send("debug", error)
+      console.log(error)
+      output = dest
+    }
   }
   window?.webContents.send("conversion-finished", {id: info.id, output})
   nextQueue(info)

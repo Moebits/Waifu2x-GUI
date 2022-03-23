@@ -62,11 +62,13 @@ const DirectoryBar: React.FunctionComponent = (props) => {
                 setDefaultDir(f)
                 setDirectory(f)
                 setSource(false)
+                ipcRenderer.invoke("select-directory", f)
             })
         } else {
             setSource(true)
             setDefaultDir("{source}/")
             setDirectory("{source}/")
+            ipcRenderer.invoke("select-directory", "{source}/")
         }
     }
 
