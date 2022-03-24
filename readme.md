@@ -8,12 +8,12 @@ you can access more advanced settings in the top bar.
 Note: Upscaling videos and gifs will take a very long time without a high-end graphics card!
 
 ### Features:
-- Upscale and/or denoise images (png, jpg, webp, tiff, etc.)
-- Upscale and/or denoise GIFs
+- Upscale and/or denoise images (png, jpg, webp, etc.)
+- Upscale and/or denoise animated images (gif, animated webp)
 - Upscale and/or denoise videos (mp4, webm, ogv, etc.)
-- Apply effects such as speed or reverse (gifs/videos)
+- Apply effects such as speed or reverse (animated images/videos)
 - Customize settings (noise, scale, mode, framerate, etc.)
-- Upscale multiple images (or multiple frames of a gif/video) concurrently
+- Upscale multiple images (or multiple frames of an animated image/video) concurrently
 
 Warning: Upscaling too many images in parallel can cause your computer to freeze if it runs out of CPU/memory.
 
