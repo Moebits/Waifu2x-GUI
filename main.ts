@@ -17,8 +17,10 @@ let ffmpegPath = undefined as any
 if (process.platform === "darwin") ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg.app")
 if (process.platform === "win32") ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg.exe") 
 let waifu2xPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/waifu2x")
+let webpPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/webp")
 if (!fs.existsSync(ffmpegPath)) ffmpegPath = undefined
 if (!fs.existsSync(waifu2xPath)) waifu2xPath = path.join(__dirname, "../waifu2x")
+if (!fs.existsSync(webpPath)) webpPath = path.join(__dirname, "../webp")
 autoUpdater.autoDownload = false
 const store = new Store()
 
@@ -196,7 +198,8 @@ const upscale = async (info: any) => {
     transparency: info.gifTransparency,
     pitch: info.pitch,
     ffmpegPath,
-    waifu2xPath
+    waifu2xPath,
+    webpPath
   }
   const action = () => {
     const index = active.findIndex((e) => e.id === info.id)
@@ -234,23 +237,15 @@ const upscale = async (info: any) => {
       output = await waifu2x.upscaleImage(info.source, dest, options, action)
     } else if (info.type === "gif") {
       output = await waifu2x.upscaleGIF(info.source, dest, options, progress)
+    } else if (info.type === "animated webp") {
+      output = await waifu2x.upscaleAnimatedWebp(info.source, dest, options, progress)
     } else if (info.type === "video") {
       output = await waifu2x.upscaleVideo(info.source, dest, options, progress)
     }
   } catch (error) {
-    if (path.extname(info.source) === ".webp") {
-      try {
-        output = await waifu2x.upscaleAnimatedWebp(info.source, dest, options, progress)
-      } catch (error) {
-        window?.webContents.send("debug", error)
-        console.log(error)
-        output = dest
-      }
-    } else {
       window?.webContents.send("debug", error)
       console.log(error)
       output = dest
-    }
   }
   window?.webContents.send("conversion-finished", {id: info.id, output})
   nextQueue(info)
@@ -379,13 +374,15 @@ if (!singleLock) {
     window = new BrowserWindow({width: 800, height: 600, minWidth: 720, minHeight: 450, frame: false, backgroundColor: "#5ea8da", center: true, webPreferences: {nodeIntegration: true, contextIsolation: false}})
     window.loadFile(path.join(__dirname, "index.html"))
     window.removeMenu()
-    if (ffmpegPath) fs.chmodSync(ffmpegPath, "777")
+    if (process.platform === "darwin") {
+      if (ffmpegPath) fs.chmodSync(ffmpegPath, "777")
+      waifu2x.chmod777(waifu2xPath, webpPath)
+    }
     require("@electron/remote/main").enable(window.webContents)
     window.on("closed", () => {
       window = null
     })
     if (process.env.DEVELOPMENT === "true") {
-      if (process.platform === "darwin") fs.chmodSync(`${waifu2xPath}/waifu2x-converter-cpp.app`, "777")
       globalShortcut.register("Control+Shift+I", () => {
         window?.webContents.toggleDevTools()
       })

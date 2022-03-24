@@ -20,7 +20,23 @@ export default class Functions {
         return `${split.slice(0, 70)}${ext}`
     }
 
+    public static isAnimatedWebp = (file: string) => {
+        const buffer = fs.readFileSync(file)
+        if (buffer.indexOf("ANMF") != -1) {
+            return true
+        } else {
+            return false
+        }
+    }
+
     public static getType = (str: string) => {
+        if (str.includes(".webp")) {
+            if (Functions.isAnimatedWebp(str)) {
+                return "animated webp"
+            } else {
+                return "image"
+            }
+        }
         if (Functions.arrayIncludes(path.extname(str), images)) return "image"
         if (Functions.arrayIncludes(path.extname(str), gifs)) return "gif"
         if (Functions.arrayIncludes(path.extname(str), videos)) return "video"
