@@ -26,7 +26,6 @@ export const OriginalFramerateContext = React.createContext<any>(null)
 export const FramerateContext = React.createContext<any>(null)
 export const VideoQualityContext = React.createContext<any>(null)
 export const GIFQualityContext = React.createContext<any>(null)
-export const GIFCumulativeContext = React.createContext<any>(null)
 export const PNGCompressionContext = React.createContext<any>(null)
 export const JPGQualityContext = React.createContext<any>(null)
 export const ParallelFramesContext = React.createContext<any>(null)
@@ -53,7 +52,6 @@ const App = () => {
   const [framerate, setFramerate] = useState(24)
   const [videoQuality, setVideoQuality] = useState(16)
   const [gifQuality, setGIFQuality] = useState(10)
-  const [gifCumulative, setGIFCumulative] = useState(true)
   const [pngCompression, setPNGCompression] = useState(3)
   const [jpgQuality, setJPGQuality] = useState(100)
   const [parallelFrames, setParallelFrames] = useState(2)
@@ -88,7 +86,6 @@ const App = () => {
       <JPGQualityContext.Provider value={{jpgQuality, setJPGQuality}}>
       <PNGCompressionContext.Provider value={{pngCompression, setPNGCompression}}>
       <GIFQualityContext.Provider value={{gifQuality, setGIFQuality}}>
-      <GIFCumulativeContext.Provider value={{gifCumulative, setGIFCumulative}}>
       <VideoQualityContext.Provider value={{videoQuality, setVideoQuality}}>
       <FramerateContext.Provider value ={{framerate, setFramerate}}>
       <ClearAllContext.Provider value={{clearAll, setClearAll}}>
@@ -117,7 +114,6 @@ const App = () => {
       </ClearAllContext.Provider>
       </FramerateContext.Provider>
       </VideoQualityContext.Provider>
-      </GIFCumulativeContext.Provider>
       </GIFQualityContext.Provider>
       </PNGCompressionContext.Provider>
       </JPGQualityContext.Provider>

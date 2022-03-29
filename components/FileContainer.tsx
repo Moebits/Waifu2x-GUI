@@ -18,7 +18,7 @@ import stopButtonHover from "../assets/stopButton-hover.png"
 import stopButton from "../assets/stopButton.png"
 import trashButtonHover from "../assets/trashButton-hover.png"
 import trashButton from "../assets/trashButton.png"
-import {BlockSizeContext, DirectoryContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFCumulativeContext,
+import {BlockSizeContext, DirectoryContext, DisableGPUContext, ForceOpenCLContext, FramerateContext,
 GIFQualityContext, GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext,
 PitchContext, PNGCompressionContext, PreviewContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext} from "../renderer"
 import functions from "../structures/functions"
@@ -49,7 +49,6 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const {originalFramerate} = useContext(OriginalFramerateContext)
     const {framerate} = useContext(FramerateContext)
     const {videoQuality} = useContext(VideoQualityContext)
-    const {gifCumulative} = useContext(GIFCumulativeContext)
     const {gifQuality} = useContext(GIFQualityContext)
     const {pngCompression} = useContext(PNGCompressionContext)
     const {jpgQuality} = useContext(JPGQualityContext)
@@ -149,7 +148,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         setStartSignal(false)
         const fps = originalFramerate ? props.framerate : framerate
         const quality = props.type === "gif" ? gifQuality : videoQuality
-        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, pitch, scale, noise, mode, speed, reverse, quality, rename, gifCumulative, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, gifTransparency}, startAll)
+        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, pitch, scale, noise, mode, speed, reverse, quality, rename, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, gifTransparency}, startAll)
         setLockedStats({framerate: fps, noise, scale, mode, speed, reverse})
         if (!startAll) {
             setStarted(true)

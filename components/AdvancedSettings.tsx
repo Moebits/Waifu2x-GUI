@@ -2,7 +2,7 @@ import {ipcRenderer} from "electron"
 import React, {useContext, useEffect, useRef, useState} from "react"
 import checkboxChecked from "../assets/checkbox2-checked.png"
 import checkbox from "../assets/checkbox2.png"
-import {BlockSizeContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFCumulativeContext, GIFQualityContext,
+import {BlockSizeContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFQualityContext,
 GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext,
 PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext, QueueContext} from "../renderer"
 import functions from "../structures/functions"
@@ -13,7 +13,6 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     const {framerate, setFramerate} = useContext(FramerateContext)
     const {videoQuality, setVideoQuality} = useContext(VideoQualityContext)
     const {gifQuality, setGIFQuality} = useContext(GIFQualityContext)
-    const {gifCumulative, setGIFCumulative} = useContext(GIFCumulativeContext)
     const {pngCompression, setPNGCompression} = useContext(PNGCompressionContext)
     const {jpgQuality, setJPGQuality} = useContext(JPGQualityContext)
     const {parallelFrames, setParallelFrames} = useContext(ParallelFramesContext)
@@ -57,7 +56,6 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
             setVideoQuality(settings.videoQuality)
             setGIFQuality(settings.gifQuality)
             setGIFTransparency(settings.gifTransparency)
-            setGIFCumulative(settings.gifCumulative)
             setPNGCompression(settings.pngCompression)
             setJPGQuality(settings.jpgQuality)
             setParallelFrames(settings.parallelFrames)
@@ -76,7 +74,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     }
 
     useEffect(() => {
-        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, gifCumulative, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, queue})
+        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, queue})
         functions.logoDrag(!visible)
     })
 
@@ -91,7 +89,6 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setFramerate(24)
         setVideoQuality(16)
         setGIFTransparency(true)
-        setGIFCumulative(true)
         setGIFQuality(10)
         setPNGCompression(3)
         setJPGQuality(100)
@@ -352,10 +349,6 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                         <div className="settings-row">
                             <p className="settings-text">GIF Transparency? </p>
                             <img src={gifTransparency ? checkboxChecked : checkbox} onClick={() => setGIFTransparency((prev: boolean) => !prev)} className="settings-checkbox"/>
-                        </div>
-                        <div className="settings-row">
-                            <p className="settings-text">GIF Cumulative? </p>
-                            <img src={gifCumulative ? checkboxChecked : checkbox} onClick={() => setGIFCumulative((prev: boolean) => !prev)} className="settings-checkbox"/>
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">GIF Quality: </p>
