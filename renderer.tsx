@@ -63,7 +63,7 @@ const App = () => {
   const [rename, setRename] = useState("2x")
   const [gifTransparency, setGIFTransparency] = useState(true)
   const [pitch, setPitch] = useState(true)
-  const [sdColorSpace, setSDColorSpace] = useState(false)
+  const [sdColorSpace, setSDColorSpace] = useState(true)
   const [queue, setQueue] = useState(1)
 
   const [previewVisible, setPreviewVisible] = useState(false)

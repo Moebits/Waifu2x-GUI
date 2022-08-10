@@ -106,7 +106,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setMode("noise-scale")
         setPitch(true)
         setQueue(1)
-        setSDColorSpace(false)
+        setSDColorSpace(true)
     }
 
     const changeRename = (event: React.ChangeEvent<HTMLInputElement>) => {
