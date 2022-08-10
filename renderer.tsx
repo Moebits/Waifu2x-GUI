@@ -36,6 +36,7 @@ export const ThreadsContext = React.createContext<any>(null)
 export const RenameContext = React.createContext<any>(null)
 export const GIFTransparencyContext = React.createContext<any>(null)
 export const PitchContext = React.createContext<any>(null)
+export const SDColorSpaceContext = React.createContext<any>(null)
 export const PreviewContext = React.createContext<any>(null)
 export const QueueContext = React.createContext<any>(null)
 
@@ -62,6 +63,7 @@ const App = () => {
   const [rename, setRename] = useState("2x")
   const [gifTransparency, setGIFTransparency] = useState(true)
   const [pitch, setPitch] = useState(true)
+  const [sdColorSpace, setSDColorSpace] = useState(false)
   const [queue, setQueue] = useState(1)
 
   const [previewVisible, setPreviewVisible] = useState(false)
@@ -72,6 +74,7 @@ const App = () => {
 
   return (
     <main className="app">
+      <SDColorSpaceContext.Provider value={{sdColorSpace, setSDColorSpace}}>
       <QueueContext.Provider value={{queue, setQueue}}>
       <PreviewContext.Provider value={{previewVisible, setPreviewVisible}}>
       <PitchContext.Provider value={{pitch, setPitch}}>
@@ -128,6 +131,7 @@ const App = () => {
       </PitchContext.Provider>
       </PreviewContext.Provider>
       </QueueContext.Provider>
+      </SDColorSpaceContext.Provider>
     </main>
   )
 }

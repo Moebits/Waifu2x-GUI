@@ -196,6 +196,7 @@ const upscale = async (info: any) => {
     parallelFrames: Number(info.parallelFrames),
     transparentColor: info.gifTransparency ? "#000000" : undefined,
     pitch: info.pitch,
+    sdColorSpace: info.sdColorSpace,
     ffmpegPath,
     waifu2xPath,
     webpPath

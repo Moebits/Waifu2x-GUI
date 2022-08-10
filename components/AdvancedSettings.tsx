@@ -2,7 +2,7 @@ import {ipcRenderer} from "electron"
 import React, {useContext, useEffect, useRef, useState} from "react"
 import checkboxChecked from "../assets/checkbox2-checked.png"
 import checkbox from "../assets/checkbox2.png"
-import {BlockSizeContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFQualityContext,
+import {BlockSizeContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFQualityContext, SDColorSpaceContext,
 GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext,
 PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext, QueueContext} from "../renderer"
 import functions from "../structures/functions"
@@ -22,6 +22,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     const {threads, setThreads} = useContext(ThreadsContext)
     const {rename, setRename} = useContext(RenameContext)
     const {pitch, setPitch} = useContext(PitchContext)
+    const {sdColorSpace, setSDColorSpace} = useContext(SDColorSpaceContext)
     const {noise, setNoise} = useContext(NoiseContext)
     const {scale, setScale} = useContext(ScaleContext)
     const {speed, setSpeed} = useContext(SpeedContext)
@@ -70,11 +71,12 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
             setMode(settings.mode)
             setPitch(settings.pitch)
             setQueue(settings.queue)
+            setSDColorSpace(settings.sdColorSpace)
         }
     }
 
     useEffect(() => {
-        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, queue})
+        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, queue, sdColorSpace})
         functions.logoDrag(!visible)
     })
 
@@ -104,6 +106,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setMode("noise-scale")
         setPitch(true)
         setQueue(1)
+        setSDColorSpace(false)
     }
 
     const changeRename = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -341,6 +344,10 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                         <div className="settings-row">
                             <p className="settings-text">Pitch Audio? </p>
                             <img src={pitch ? checkboxChecked : checkbox} onClick={() => setPitch((prev: boolean) => !prev)} className="settings-checkbox"/>
+                        </div>
+                        <div className="settings-row">
+                            <p className="settings-text">SD Colorspace? </p>
+                            <img src={sdColorSpace ? checkboxChecked : checkbox} onClick={() => setSDColorSpace((prev: boolean) => !prev)} className="settings-checkbox"/>
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">Video Quality: </p>
