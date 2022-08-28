@@ -73,6 +73,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const [stopped, setStopped] = useState(false)
     const [deleted, setDeleted] = useState(false)
     const [progress, setProgress] = useState(null) as any
+    const [frame, setFrame] = useState("")
     const [frames, setFrames] = useState("")
     const [progressColor, setProgressColor] = useState("")
     const [backgroundColor, setBackgroundColor] = useState("")
@@ -93,11 +94,13 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
                 props.setStart(props.id)
             }
         }
-        const conversionProgress = (event: any, info: {id: number, current: number, total: number}) => {
+        const conversionProgress = (event: any, info: {id: number, current: number, total: number, frame: string}) => {
             if (info.id === props.id) {
                 const newProgress = (info.current / info.total) * 100
                 if (progress !== newProgress) {
+                    console.log(info)
                     setProgress(newProgress)
+                    setFrame(info.frame)
                     setFrames(`${info.current} / ${info.total}`)
                 }
             }
@@ -105,6 +108,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         const conversionFinished = (event: any, info: {id: number, output: string}) => {
             if (info.id === props.id) {
                 setOutput(info.output)
+                setFrame("")
                 setShowNew(true)
             }
         }
@@ -268,7 +272,10 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const preview = (event: React.MouseEvent<HTMLElement>) => {
         const source = showNew ? output : props.source
         if (event.ctrlKey) return ipcRenderer.invoke("add-file", source, props.id)
-        if (event.button === 2 && !drag) ipcRenderer.invoke("preview", source, props.type)
+        if (event.button === 2 && !drag) {
+            if (frame) return ipcRenderer.invoke("preview", frame, "image")
+            ipcRenderer.invoke("preview", source, props.type)
+        }
     }
 
     const toggleNew = () => {
@@ -305,11 +312,21 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         }
     }
 
+    const getThumbnail = () => {
+        if (props.type === "video") {
+            if (frame) return <img className="file-img" onMouseDown={delayPress} onMouseUp={preview} src={frame}/>
+            return <video className="file-img" onMouseDown={delayPress} onMouseUp={preview} muted autoPlay loop><source src={showNew ? output : props.source}></source></video>
+        } else {
+            if (frame) return <img className="file-img" onMouseDown={delayPress} onMouseUp={preview} src={frame}/>
+            return <img className="file-img" onMouseDown={delayPress} onMouseUp={preview} src={showNew ? output : props.source}/>
+        }
+    }
+
     return (
         <section ref={fileContainerRef} className="file-wrap-container" onMouseOver={() => setHover(true)} onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
             <div className="file-container" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} onMouseDown={() => setDrag(false)} onMouseMove={() => setDrag(true)}>
             <div className="file-img-container">
-                {props.type === "video" ? <video className="file-img" onMouseDown={delayPress} onMouseUp={preview} muted autoPlay loop><source src={showNew ? output : props.source}></source></video> : <img className="file-img" onMouseDown={delayPress} onMouseUp={preview} src={showNew ? output : props.source}/>}
+                {getThumbnail()}
             </div>
             <div className="file-middle">
                 <div className="file-group-top">

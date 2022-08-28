@@ -201,21 +201,6 @@ const upscale = async (info: any) => {
     waifu2xPath,
     webpPath
   }
-  const action = () => {
-    const index = active.findIndex((e) => e.id === info.id)
-    if (index !== -1) {
-      const action = active[index].action
-      if (action === "stop") return "stop"
-    }
-  }
-  const progress = (current: number, total: number) => {
-    window?.webContents.send("conversion-progress", {id: info.id, current, total})
-    const index = active.findIndex((e) => e.id === info.id)
-    if (index !== -1) {
-      const action = active[index].action
-      if (action === "stop") return true
-    }
-  }
   if (process.platform !== "win32") {
     info.source = info.source.replace("file://", "")
   }
@@ -228,6 +213,28 @@ const upscale = async (info: any) => {
   const duplicate = active.find((a) => a.dest === dest)
   if (!overwrite && (fs.existsSync(dest) || duplicate)) dest = functions.newDest(dest, active)
   dest = dest.replace(/\\/g, "/")
+  const action = () => {
+    const index = active.findIndex((e) => e.id === info.id)
+    if (index !== -1) {
+      const action = active[index].action
+      if (action === "stop") return "stop"
+    }
+  }
+  const progress = (current: number, total: number) => {
+    const index = active.findIndex((e) => e.id === info.id)
+    let frame = null
+    if (index !== -1) {
+      const action = active[index].action
+      const frameDest = `${path.dirname(dest)}/${path.basename(info.source, path.extname(info.source))}Frames`
+      if (fs.existsSync(frameDest)) {
+        let frameArray = fs.readdirSync(frameDest).map((f) => `${frameDest}/${f}`).filter((f) => path.extname(f) === ".png")
+        frameArray = frameArray.sort(new Intl.Collator(undefined, {numeric: true, sensitivity: "base"}).compare)
+        frame = frameArray[current]
+      }
+      if (action === "stop") return true
+    }
+    window?.webContents.send("conversion-progress", {id: info.id, current, total, frame})
+  }
   history.push({id: info.id, source: info.source, dest, type: info.type})
   active.push({id: info.id, source: info.source, dest, type: info.type, action: null})
   window?.webContents.send("conversion-started", {id: info.id})
@@ -382,10 +389,8 @@ if (!singleLock) {
     window.on("closed", () => {
       window = null
     })
-    if (process.env.DEVELOPMENT === "true") {
-      globalShortcut.register("Control+Shift+I", () => {
-        window?.webContents.toggleDevTools()
-      })
-    }
+    globalShortcut.register("Control+Shift+I", () => {
+      window?.webContents.toggleDevTools()
+    })
   })
 }
