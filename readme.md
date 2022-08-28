@@ -23,6 +23,11 @@ To install, just download the latest exe installer from the [releases](https://g
 
 Note: If you install it under `C:/Program Files` you might need to run it as administrator.
 
+### MacOS
+It probably requires compiling waifu2x-converter-cpp from source. See [here](https://github.com/DeadSix27/waifu2x-converter-cpp/blob/master/BUILDING.md#macos--osx), you may need to edit the clang and llvm paths in CMakeLists.txt (for me it was in `/opt/homebrew/Cellar` instead of `/usr/local`).
+
+Replace the `waifu2x-converter-cpp.app` in `/Applications/Waifu2x GUI.app/Contents/Resources/app.asar.unpacked/node_modules/waifu2x/waifu2x` with your compiled version. 
+
 ### Bugs and Requests
 
 Open an issue on my GitHub repository. I appreciate any requests, but I can't guarantee that I will fulfill all of them.
