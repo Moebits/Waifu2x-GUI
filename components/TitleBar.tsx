@@ -96,7 +96,7 @@ const TitleBar: React.FunctionComponent = (props) => {
             document.documentElement.style.setProperty("--text-color", "black")
             document.documentElement.style.setProperty("--dir-color", "#4985b4")
             document.documentElement.style.setProperty("--dir-text", "black")
-            document.documentElement.style.setProperty("--settings-color", "#673efa")
+            document.documentElement.style.setProperty("--settings-color", "#3e4cfa")
             document.documentElement.style.setProperty("--settings-text", "black")
             document.documentElement.style.setProperty("--settings-revert", "#563bf0")
             document.documentElement.style.setProperty("--settings-revert-text", "black")

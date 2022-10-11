@@ -2,8 +2,9 @@ import {ipcRenderer} from "electron"
 import React, {useContext, useEffect, useRef, useState} from "react"
 import checkboxChecked from "../assets/checkbox2-checked.png"
 import checkbox from "../assets/checkbox2.png"
+import {Dropdown, DropdownButton} from "react-bootstrap"
 import {BlockSizeContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFQualityContext, SDColorSpaceContext,
-GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext,
+GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext, UpscalerContext,
 PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext, QueueContext} from "../renderer"
 import functions from "../structures/functions"
 import "../styles/advancedsettings.less"
@@ -30,6 +31,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     const {mode, setMode} = useContext(ModeContext)
     const {gifTransparency, setGIFTransparency} = useContext(GIFTransparencyContext)
     const {queue, setQueue} = useContext(QueueContext)
+    const {upscaler, setUpscaler} = useContext(UpscalerContext)
     const [visible, setVisible] = useState(false)
 
     useEffect(() => {
@@ -72,11 +74,12 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
             setPitch(settings.pitch)
             setQueue(settings.queue)
             setSDColorSpace(settings.sdColorSpace)
+            setUpscaler(settings.upscaler)
         }
     }
 
     useEffect(() => {
-        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, queue, sdColorSpace})
+        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, queue, sdColorSpace, upscaler})
         functions.logoDrag(!visible)
     })
 
@@ -107,6 +110,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setPitch(true)
         setQueue(1)
         setSDColorSpace(true)
+        setUpscaler("waifu2x")
     }
 
     const changeRename = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -323,6 +327,11 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         ipcRenderer.invoke("update-concurrency", Number(value))
     }
 
+    const getUpscaler = () => {
+        if (upscaler === "real-esrgan") return "Real-ESRGAN Anime"
+        return upscaler
+    }
+
     if (visible) {
         return (
             <section className="settings-dialog">
@@ -330,6 +339,13 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                     <div className="settings-container">
                         <div className="settings-title-container">
                             <p className="settings-title">Advanced Settings</p>
+                        </div>
+                        <div className="settings-row">
+                            <p className="settings-text">Upscaler: </p>
+                            <DropdownButton className="btn-filter" title={getUpscaler()} drop="down">
+                                <Dropdown.Item active={upscaler === "waifu2x"} onClick={() => setUpscaler("waifu2x")}>waifu2x</Dropdown.Item>
+                                <Dropdown.Item active={upscaler === "real-esrgan"} onClick={() => setUpscaler("real-esrgan")}>Real-ESRGAN Anime</Dropdown.Item>
+                            </DropdownButton>
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">Rename: </p>

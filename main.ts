@@ -17,9 +17,11 @@ let ffmpegPath = undefined as any
 if (process.platform === "darwin") ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg.app")
 if (process.platform === "win32") ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg.exe") 
 let waifu2xPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/waifu2x")
+let esrganPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/real-esrgan")
 let webpPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/webp")
 if (!fs.existsSync(ffmpegPath)) ffmpegPath = undefined
 if (!fs.existsSync(waifu2xPath)) waifu2xPath = path.join(__dirname, "../waifu2x")
+if (!fs.existsSync(esrganPath)) esrganPath = path.join(__dirname, "../real-esrgan")
 if (!fs.existsSync(webpPath)) webpPath = path.join(__dirname, "../webp")
 autoUpdater.autoDownload = false
 const store = new Store()
@@ -197,8 +199,10 @@ const upscale = async (info: any) => {
     transparentColor: info.gifTransparency ? "#000000" : undefined,
     pitch: info.pitch,
     sdColorSpace: info.sdColorSpace,
+    upscaler: info.upscaler,
     ffmpegPath,
     waifu2xPath,
+    esrganPath,
     webpPath
   }
   if (process.platform !== "win32") {
@@ -213,12 +217,13 @@ const upscale = async (info: any) => {
   const duplicate = active.find((a) => a.dest === dest)
   if (!overwrite && (fs.existsSync(dest) || duplicate)) dest = functions.newDest(dest, active)
   dest = dest.replace(/\\/g, "/")
-  const action = () => {
+  const action = (percent?: number) => {
     const index = active.findIndex((e) => e.id === info.id)
     if (index !== -1) {
       const action = active[index].action
-      if (action === "stop") return "stop"
+      if (action === "stop") return true
     }
+    if (percent !== undefined) window?.webContents.send("conversion-progress", {id: info.id, percent})
   }
   const progress = (current: number, total: number) => {
     const index = active.findIndex((e) => e.id === info.id)
@@ -383,7 +388,7 @@ if (!singleLock) {
     window.removeMenu()
     if (process.platform === "darwin") {
       if (ffmpegPath) fs.chmodSync(ffmpegPath, "777")
-      waifu2x.chmod777(waifu2xPath, webpPath)
+      waifu2x.chmod777(waifu2xPath, webpPath, esrganPath)
     }
     require("@electron/remote/main").enable(window.webContents)
     window.on("closed", () => {

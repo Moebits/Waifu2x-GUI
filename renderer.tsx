@@ -39,6 +39,7 @@ export const PitchContext = React.createContext<any>(null)
 export const SDColorSpaceContext = React.createContext<any>(null)
 export const PreviewContext = React.createContext<any>(null)
 export const QueueContext = React.createContext<any>(null)
+export const UpscalerContext = React.createContext<any>(null)
 
 const App = () => {
   const [directory, setDirectory] = useState("")
@@ -65,6 +66,7 @@ const App = () => {
   const [pitch, setPitch] = useState(true)
   const [sdColorSpace, setSDColorSpace] = useState(true)
   const [queue, setQueue] = useState(1)
+  const [upscaler, setUpscaler] = useState("waifu2x")
 
   const [previewVisible, setPreviewVisible] = useState(false)
 
@@ -74,6 +76,7 @@ const App = () => {
 
   return (
     <main className="app">
+      <UpscalerContext.Provider value={{upscaler, setUpscaler}}>
       <SDColorSpaceContext.Provider value={{sdColorSpace, setSDColorSpace}}>
       <QueueContext.Provider value={{queue, setQueue}}>
       <PreviewContext.Provider value={{previewVisible, setPreviewVisible}}>
@@ -132,6 +135,7 @@ const App = () => {
       </PreviewContext.Provider>
       </QueueContext.Provider>
       </SDColorSpaceContext.Provider>
+      </UpscalerContext.Provider>
     </main>
   )
 }

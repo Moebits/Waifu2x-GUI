@@ -18,7 +18,7 @@ import stopButtonHover from "../assets/stopButton-hover.png"
 import stopButton from "../assets/stopButton.png"
 import trashButtonHover from "../assets/trashButton-hover.png"
 import trashButton from "../assets/trashButton.png"
-import {BlockSizeContext, DirectoryContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, SDColorSpaceContext,
+import {BlockSizeContext, DirectoryContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, SDColorSpaceContext, UpscalerContext,
 GIFQualityContext, GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext,
 PitchContext, PNGCompressionContext, PreviewContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext} from "../renderer"
 import functions from "../structures/functions"
@@ -57,6 +57,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const {forceOpenCL} = useContext(ForceOpenCLContext)
     const {blockSize} = useContext(BlockSizeContext)
     const {threads} = useContext(ThreadsContext)
+    const {upscaler} = useContext(UpscalerContext)
     const {rename} = useContext(RenameContext)
     const {pitch} = useContext(PitchContext)
     const {sdColorSpace} = useContext(SDColorSpaceContext)
@@ -94,14 +95,15 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
                 props.setStart(props.id)
             }
         }
-        const conversionProgress = (event: any, info: {id: number, current: number, total: number, frame: string}) => {
+        const conversionProgress = (event: any, info: {id: number, current: number, total: number, frame: string, percent?: number}) => {
             if (info.id === props.id) {
-                const newProgress = (info.current / info.total) * 100
+                const newProgress = info.percent ? info.percent : (info.current / info.total) * 100
                 if (progress !== newProgress) {
-                    console.log(info)
                     setProgress(newProgress)
-                    setFrame(info.frame)
-                    setFrames(`${info.current} / ${info.total}`)
+                    if (info.frame) {
+                        setFrame(info.frame)
+                        setFrames(`${info.current} / ${info.total}`)
+                    }
                 }
             }
         }
@@ -153,7 +155,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         setStartSignal(false)
         const fps = originalFramerate ? props.framerate : framerate
         const quality = props.type === "gif" ? gifQuality : videoQuality
-        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, pitch, scale, noise, mode, speed, reverse, quality, rename, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, gifTransparency, sdColorSpace}, startAll)
+        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, pitch, scale, noise, mode, speed, reverse, quality, rename, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, upscaler, gifTransparency, sdColorSpace}, startAll)
         setLockedStats({framerate: fps, noise, scale, mode, speed, reverse})
         if (!startAll) {
             setStarted(true)
