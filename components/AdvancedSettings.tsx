@@ -110,7 +110,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setPitch(true)
         setQueue(1)
         setSDColorSpace(true)
-        setUpscaler("waifu2x")
+        setUpscaler("real-esrgan")
     }
 
     const changeRename = (event: React.ChangeEvent<HTMLInputElement>) => {

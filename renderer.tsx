@@ -66,7 +66,7 @@ const App = () => {
   const [pitch, setPitch] = useState(true)
   const [sdColorSpace, setSDColorSpace] = useState(true)
   const [queue, setQueue] = useState(1)
-  const [upscaler, setUpscaler] = useState("waifu2x")
+  const [upscaler, setUpscaler] = useState("real-esrgan")
 
   const [previewVisible, setPreviewVisible] = useState(false)
 

@@ -1,6 +1,6 @@
 {
   "name": "waifu2x-gui",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "A gui app that upscales anime-styled images with waifu2x",
   "main": "dist/main.js",
   "scripts": {
@@ -64,6 +64,16 @@
       "installerSidebar": "./assets/installer.bmp",
       "uninstallerSidebar": "./assets/installer.bmp"
     },
+    "linux": {
+      "target": {
+        "target": "appImage",
+        "arch": "x64"
+      },
+      "category": "Utility",
+      "extraFiles": [
+        "ffmpeg/ffmpeg"
+      ]
+    },
     "files": [
       "dist/**/*",
       "package.json"
@@ -113,6 +123,6 @@
     "react-dropzone": "^11.3.0",
     "react-reorder": "^3.0.0-alpha.7",
     "shade-blend-color": "^1.0.0",
-    "waifu2x": "^1.1.2"
+    "waifu2x": "^1.1.3"
   }
 }
