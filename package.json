@@ -7,7 +7,7 @@
     "start": "npm run clean && webpack && cross-env DEVELOPMENT=true electron dist/main.js",
     "clean": "del-cli ./dist",
     "build": "npm run clean ./build && webpack && electron-builder -p never",
-    "release": "npm run clean ./build && webpack && electron-builder -mw -p always"
+    "release": "npm run clean ./build && webpack && electron-builder -mwl -p always"
   },
   "keywords": [
     "waifu2x",

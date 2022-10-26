@@ -20,7 +20,7 @@ Warning: Upscaling too many images in parallel can cause your computer to freeze
 
 ### Real-ESRGAN Anime
 
-The Real-ESRGAN Anime upscaler is much faster and gives better results than waifu2x, so it is recommended to use it instead. The default is waifu2x, as that is the program name obviously. 
+The Real-ESRGAN Anime upscaler is much faster and gives better results than waifu2x, so it is recommended to use it instead.
 
 Real-ESRGAN only supports scale factors between 2-4, and all other waifu2x options are ignored. By setting the scale factor to 4x, it will use the slower Anime4x model but this gives better results, so it is recommended to upscale images at 4x when using Real-ESRGAN.
 
