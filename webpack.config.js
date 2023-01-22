@@ -37,14 +37,14 @@ module.exports = [
     entry: "./main",
     mode: "production",
     node: {__dirname: false},
+    externals: {"sharp": "commonjs sharp"},
     output: {filename: "main.js", path: path.resolve(__dirname, "./dist")},
     resolve: {extensions: [".js", ".jsx", ".ts", ".tsx"], alias: {"react-dom$": "react-dom/profiling", "scheduler/tracing": "scheduler/tracing-profiling"}},
     optimization: {minimize: true, minimizer: [new TerserJSPlugin({extractComments: false})], moduleIds: "named"},
     module: {
       rules: [
           {test: /\.(jpe?g|png|gif|svg|mp3|wav|mp4|yml|txt)$/, exclude, use: [{loader: "file-loader", options: {name: "[path][name].[ext]"}}]},
-          {test: /\.(tsx?|jsx?)$/, exclude, use: [{loader: "ts-loader", options: {transpileOnly: true}}]},
-          {test: /\.node$/, loader: "node-loader"}
+          {test: /\.(tsx?|jsx?)$/, exclude, use: [{loader: "ts-loader", options: {transpileOnly: true}}]}
       ]
     },
     plugins: [

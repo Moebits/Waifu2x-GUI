@@ -1,13 +1,20 @@
 {
   "name": "waifu2x-gui",
-  "version": "0.3.9",
+  "version": "0.4.0",
   "description": "A gui app that upscales anime-styled images with waifu2x",
   "main": "dist/main.js",
   "scripts": {
     "start": "npm run clean && webpack && cross-env DEVELOPMENT=true electron dist/main.js",
     "clean": "del-cli ./dist",
     "build": "npm run clean ./build && webpack && electron-builder -p never",
-    "release": "npm run clean ./build && webpack && electron-builder -mwl -p always"
+    "rebuild": "npm rebuild --runtime=electron --target=14.0.0 --disturl=https://atom.io/download/atom-shell --abi=83",
+    "release": "npm run release:win && npm run release:linux && npm run release:mac",
+    "release:mac": "npm run clean ./build && webpack && npm run sharp:mac && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -m -p always",
+    "release:win": "npm run clean ./build && webpack && npm run sharp:win && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -w -p always",
+    "release:linux": "npm run clean ./build && webpack && npm run sharp:linux && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -l -p always",
+    "sharp:mac": "del-cli ./node_modules/sharp && npm install --platform=darwin --arch=arm64 sharp",
+    "sharp:win": "del-cli ./node_modules/sharp && npm install --platform=win32 --arch=x64 sharp",
+    "sharp:linux": "del-cli ./node_modules/sharp && npm install --platform=linux --arch=x64 sharp"
   },
   "keywords": [
     "waifu2x",
@@ -92,6 +99,7 @@
     "@tenpi/tslint": "^1.1.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "@types/sharp": "^0.31.1",
     "cross-env": "^7.0.3",
     "css-loader": "^5.0.1",
     "del-cli": "^3.0.1",
@@ -104,7 +112,7 @@
     "less": "^4.1.0",
     "less-loader": "^7.3.0",
     "mini-css-extract-plugin": "^1.3.5",
-    "node-loader": "^1.0.2",
+    "node-loader": "^1.0.3",
     "terser-webpack-plugin": "^5.1.1",
     "ts-loader": "^8.0.14",
     "typescript": "^4.1.3",
@@ -117,12 +125,14 @@
     "electron-store": "^7.0.1",
     "electron-updater": "^4.3.5",
     "image-size": "^0.9.3",
+    "images-meta": "github:Tenpi/images-meta",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.3",
     "react-dom": "^17.0.1",
     "react-dropzone": "^11.3.0",
     "react-reorder": "^3.0.0-alpha.7",
     "shade-blend-color": "^1.0.0",
-    "waifu2x": "^1.1.4"
+    "sharp": "^0.30.7",
+    "waifu2x": "^1.1.5"
   }
 }

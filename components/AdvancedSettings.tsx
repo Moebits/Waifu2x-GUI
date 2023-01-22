@@ -3,7 +3,7 @@ import React, {useContext, useEffect, useRef, useState} from "react"
 import checkboxChecked from "../assets/checkbox2-checked.png"
 import checkbox from "../assets/checkbox2.png"
 import {Dropdown, DropdownButton} from "react-bootstrap"
-import {BlockSizeContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFQualityContext, SDColorSpaceContext,
+import {BlockSizeContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFQualityContext, SDColorSpaceContext, CompressContext,
 GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext, UpscalerContext,
 PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext, QueueContext} from "../renderer"
 import functions from "../structures/functions"
@@ -32,6 +32,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     const {gifTransparency, setGIFTransparency} = useContext(GIFTransparencyContext)
     const {queue, setQueue} = useContext(QueueContext)
     const {upscaler, setUpscaler} = useContext(UpscalerContext)
+    const {compress, setCompress} = useContext(CompressContext)
     const [visible, setVisible] = useState(false)
 
     useEffect(() => {
@@ -75,11 +76,12 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
             setQueue(settings.queue)
             setSDColorSpace(settings.sdColorSpace)
             setUpscaler(settings.upscaler)
+            setCompress(settings.compress)
         }
     }
 
     useEffect(() => {
-        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, queue, sdColorSpace, upscaler})
+        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, queue, sdColorSpace, upscaler, compress})
         functions.logoDrag(!visible)
     })
 
@@ -111,6 +113,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setQueue(1)
         setSDColorSpace(true)
         setUpscaler("real-esrgan")
+        setCompress(true)
     }
 
     const changeRename = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -384,6 +387,10 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                         <div className="settings-row">
                             <p className="settings-text">JPG/WEBP Quality: </p>
                             <input className="settings-input" type="text" spellCheck="false" value={jpgQuality} onChange={changeJPGQuality} onKeyDown={changeJPGQualityKey}/>
+                        </div>
+                        <div className="settings-row">
+                            <p className="settings-text">Compress to JPG? </p>
+                            <img src={compress ? checkboxChecked : checkbox} onClick={() => setCompress((prev: boolean) => !prev)} className="settings-checkbox"/>
                         </div>
                         <div className="settings-row">
                                 <p className="settings-text">Concurrent Upscales: </p>

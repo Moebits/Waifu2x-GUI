@@ -40,6 +40,7 @@ export const SDColorSpaceContext = React.createContext<any>(null)
 export const PreviewContext = React.createContext<any>(null)
 export const QueueContext = React.createContext<any>(null)
 export const UpscalerContext = React.createContext<any>(null)
+export const CompressContext = React.createContext<any>(null)
 
 const App = () => {
   const [directory, setDirectory] = useState("")
@@ -67,6 +68,7 @@ const App = () => {
   const [sdColorSpace, setSDColorSpace] = useState(true)
   const [queue, setQueue] = useState(1)
   const [upscaler, setUpscaler] = useState("real-esrgan")
+  const [compress, setCompress] = useState(true)
 
   const [previewVisible, setPreviewVisible] = useState(false)
 
@@ -76,6 +78,7 @@ const App = () => {
 
   return (
     <main className="app">
+      <CompressContext.Provider value={{compress, setCompress}}>
       <UpscalerContext.Provider value={{upscaler, setUpscaler}}>
       <SDColorSpaceContext.Provider value={{sdColorSpace, setSDColorSpace}}>
       <QueueContext.Provider value={{queue, setQueue}}>
@@ -136,6 +139,7 @@ const App = () => {
       </QueueContext.Provider>
       </SDColorSpaceContext.Provider>
       </UpscalerContext.Provider>
+      </CompressContext.Provider>
     </main>
   )
 }

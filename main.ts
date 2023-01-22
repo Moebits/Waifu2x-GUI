@@ -1,11 +1,13 @@
 import {app, BrowserWindow, dialog, globalShortcut, ipcMain, shell} from "electron"
 import Store from "electron-store"
 import {autoUpdater} from "electron-updater"
+import sharp from "sharp"
 import fs from "fs"
 import imageSize from "image-size"
 import path from "path"
 import process from "process"
 import waifu2x from "waifu2x"
+import imagesMeta from "images-meta"
 import "./dev-app-update.yml"
 import pack from "./package.json"
 import functions from "./structures/functions"
@@ -247,7 +249,28 @@ const upscale = async (info: any) => {
   let output = ""
   try {
     if (info.type === "image") {
+      let meta = []
+      try {
+        const buffer = fs.readFileSync(info.source)
+        let inMime = "image/jpeg"
+        if (path.extname(info.source) === ".png") inMime = "image/png"
+        meta = imagesMeta.readMeta(buffer, inMime)
+      } catch {}
       output = await waifu2x.upscaleImage(info.source, dest, options, action)
+      if (info.compress) {
+        const inputBuffer = fs.readFileSync(output)
+        const outputBuffer = await sharp(inputBuffer, {limitInputPixels: false}).jpeg().toBuffer()
+        fs.writeFileSync(output, outputBuffer)
+        const renamePath = path.join(path.dirname(output), `${path.basename(output, path.extname(output))}.jpg`)
+        fs.renameSync(output, renamePath)
+        output = renamePath
+      }
+      if (meta?.length) {
+        let outMime = "image/jpeg"
+        if (path.extname(output) === ".png") outMime = "image/png"
+        let metaBuffer = imagesMeta.writeMeta(fs.readFileSync(output), outMime, meta, "buffer")
+        fs.writeFileSync(output, metaBuffer)
+      }
     } else if (info.type === "gif") {
       output = await waifu2x.upscaleGIF(info.source, dest, options, progress)
     } else if (info.type === "animated webp") {
