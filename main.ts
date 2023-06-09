@@ -255,6 +255,10 @@ const upscale = async (info: any) => {
         let inMime = "image/jpeg"
         if (path.extname(info.source) === ".png") inMime = "image/png"
         meta = imagesMeta.readMeta(buffer, inMime)
+        for (let i = 0; i < meta.length; i++) {
+          if (typeof meta[i]?.value !== "string") continue
+          meta[i].value = meta[i].value.replaceAll("26UNICODE", "").replaceAll(/\u0000/g, "")
+        }
       } catch {}
       output = await waifu2x.upscaleImage(info.source, dest, options, action)
       if (info.compress) {
