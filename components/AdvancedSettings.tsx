@@ -5,7 +5,8 @@ import checkbox from "../assets/checkbox2.png"
 import {Dropdown, DropdownButton} from "react-bootstrap"
 import {BlockSizeContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFQualityContext, SDColorSpaceContext, CompressContext,
 GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext, UpscalerContext,
-PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext, QueueContext} from "../renderer"
+PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext, QueueContext,
+AdvSettingsContext} from "../renderer"
 import functions from "../structures/functions"
 import "../styles/advancedsettings.less"
 
@@ -33,14 +34,14 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     const {queue, setQueue} = useContext(QueueContext)
     const {upscaler, setUpscaler} = useContext(UpscalerContext)
     const {compress, setCompress} = useContext(CompressContext)
-    const [visible, setVisible] = useState(false)
+    const {advSettings, setAdvSettings} = useContext(AdvSettingsContext)
 
     useEffect(() => {
         const showSettingsDialog = (event: any, update: any) => {
-            setVisible((prev) => !prev)
+            setAdvSettings((prev: any) => !prev)
         }
         const closeAllDialogs = (event: any, ignore: any) => {
-            if (ignore !== "settings") setVisible(false)
+            if (ignore !== "settings") setAdvSettings(false)
         }
         ipcRenderer.on("show-settings-dialog", showSettingsDialog)
         ipcRenderer.on("close-all-dialogs", closeAllDialogs)
@@ -82,12 +83,12 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
 
     useEffect(() => {
         ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, queue, sdColorSpace, upscaler, compress})
-        functions.logoDrag(!visible)
+        functions.logoDrag(!advSettings)
     })
 
     const ok = () => {
         functions.logoDrag(true)
-        setVisible(false)
+        setAdvSettings(false)
     }
 
     const revert = () => {
@@ -335,7 +336,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         return upscaler
     }
 
-    if (visible) {
+    if (advSettings) {
         return (
             <section className="settings-dialog">
                 <div className="settings-dialog-box">
