@@ -2,8 +2,11 @@ dist
 build
 node_modules
 .env
-waifu2x
-webp
 .DS_Store
 ffmpeg/.DS_Store
+waifu2x
 real-esrgan
+real-cugan
+webp
+scripts
+models/*

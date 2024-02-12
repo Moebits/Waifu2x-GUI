@@ -29,9 +29,6 @@ export const GIFQualityContext = React.createContext<any>(null)
 export const PNGCompressionContext = React.createContext<any>(null)
 export const JPGQualityContext = React.createContext<any>(null)
 export const ParallelFramesContext = React.createContext<any>(null)
-export const DisableGPUContext = React.createContext<any>(null)
-export const ForceOpenCLContext = React.createContext<any>(null)
-export const BlockSizeContext = React.createContext<any>(null)
 export const ThreadsContext = React.createContext<any>(null)
 export const RenameContext = React.createContext<any>(null)
 export const GIFTransparencyContext = React.createContext<any>(null)
@@ -59,16 +56,13 @@ const App = () => {
   const [pngCompression, setPNGCompression] = useState(3)
   const [jpgQuality, setJPGQuality] = useState(100)
   const [parallelFrames, setParallelFrames] = useState(2)
-  const [disableGPU, setDisableGPU] = useState(false)
-  const [forceOpenCL, setForceOpenCL] = useState(false)
-  const [blockSize, setBlockSize] = useState(1024)
   const [threads, setThreads] = useState(4)
   const [rename, setRename] = useState("2x")
   const [gifTransparency, setGIFTransparency] = useState(true)
   const [pitch, setPitch] = useState(true)
   const [sdColorSpace, setSDColorSpace] = useState(true)
   const [queue, setQueue] = useState(1)
-  const [upscaler, setUpscaler] = useState("real-esrgan")
+  const [upscaler, setUpscaler] = useState("waifu2x")
   const [compress, setCompress] = useState(true)
   const [advSettings, setAdvSettings] = useState(false)
 
@@ -91,9 +85,6 @@ const App = () => {
       <OriginalFramerateContext.Provider value={{originalFramerate, setOriginalFramerate}}>
       <RenameContext.Provider value={{rename, setRename}}>
       <ThreadsContext.Provider value={{threads, setThreads}}>
-      <BlockSizeContext.Provider value={{blockSize, setBlockSize}}>
-      <ForceOpenCLContext.Provider value={{forceOpenCL, setForceOpenCL}}>
-      <DisableGPUContext.Provider value={{disableGPU, setDisableGPU}}>
       <ParallelFramesContext.Provider value={{parallelFrames, setParallelFrames}}>
       <JPGQualityContext.Provider value={{jpgQuality, setJPGQuality}}>
       <PNGCompressionContext.Provider value={{pngCompression, setPNGCompression}}>
@@ -130,9 +121,6 @@ const App = () => {
       </PNGCompressionContext.Provider>
       </JPGQualityContext.Provider>
       </ParallelFramesContext.Provider>
-      </DisableGPUContext.Provider>
-      </ForceOpenCLContext.Provider>
-      </BlockSizeContext.Provider>
       </ThreadsContext.Provider>
       </RenameContext.Provider>
       </OriginalFramerateContext.Provider>

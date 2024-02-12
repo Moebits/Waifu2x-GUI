@@ -3,11 +3,12 @@ import React, {useContext, useEffect, useRef, useState} from "react"
 import checkboxChecked from "../assets/checkbox2-checked.png"
 import checkbox from "../assets/checkbox2.png"
 import {Dropdown, DropdownButton} from "react-bootstrap"
-import {BlockSizeContext, DisableGPUContext, ForceOpenCLContext, FramerateContext, GIFQualityContext, SDColorSpaceContext, CompressContext,
+import {FramerateContext, GIFQualityContext, SDColorSpaceContext, CompressContext,
 GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext, UpscalerContext,
 PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext, QueueContext,
 AdvSettingsContext} from "../renderer"
 import functions from "../structures/functions"
+import path from "path"
 import "../styles/advancedsettings.less"
 
 const AdvancedSettings: React.FunctionComponent = (props) => {
@@ -18,9 +19,6 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     const {pngCompression, setPNGCompression} = useContext(PNGCompressionContext)
     const {jpgQuality, setJPGQuality} = useContext(JPGQualityContext)
     const {parallelFrames, setParallelFrames} = useContext(ParallelFramesContext)
-    const {disableGPU, setDisableGPU} = useContext(DisableGPUContext)
-    const {forceOpenCL, setForceOpenCL} = useContext(ForceOpenCLContext)
-    const {blockSize, setBlockSize} = useContext(BlockSizeContext)
     const {threads, setThreads} = useContext(ThreadsContext)
     const {rename, setRename} = useContext(RenameContext)
     const {pitch, setPitch} = useContext(PitchContext)
@@ -35,6 +33,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     const {upscaler, setUpscaler} = useContext(UpscalerContext)
     const {compress, setCompress} = useContext(CompressContext)
     const {advSettings, setAdvSettings} = useContext(AdvSettingsContext)
+    const [pythonModels, setPythonModels] = useState([])
 
     useEffect(() => {
         const showSettingsDialog = (event: any, update: any) => {
@@ -64,9 +63,6 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
             setPNGCompression(settings.pngCompression)
             setJPGQuality(settings.jpgQuality)
             setParallelFrames(settings.parallelFrames)
-            setDisableGPU(settings.disableGPU)
-            setForceOpenCL(settings.forceOpenCL)
-            setBlockSize(settings.blockSize)
             setThreads(settings.threads)
             setNoise(settings.noise)
             setScale(settings.scale)
@@ -79,10 +75,13 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
             setUpscaler(settings.upscaler)
             setCompress(settings.compress)
         }
+        const pythonModels = await ipcRenderer.invoke("get-python-models")
+        if (pythonModels.length) setPythonModels(pythonModels)
+        console.log(pythonModels)
     }
 
     useEffect(() => {
-        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, pngCompression, jpgQuality, parallelFrames, disableGPU, forceOpenCL, blockSize, threads, queue, sdColorSpace, upscaler, compress})
+        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, pngCompression, jpgQuality, parallelFrames, threads, queue, sdColorSpace, upscaler, compress})
         functions.logoDrag(!advSettings)
     })
 
@@ -101,9 +100,6 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setPNGCompression(3)
         setJPGQuality(100)
         setParallelFrames(2)
-        setDisableGPU(false)
-        setForceOpenCL(false)
-        setBlockSize(1024)
         setThreads(4)
         setNoise(2)
         setScale(2)
@@ -113,7 +109,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setPitch(true)
         setQueue(1)
         setSDColorSpace(true)
-        setUpscaler("real-esrgan")
+        setUpscaler("waifu2x")
         setCompress(true)
     }
 
@@ -259,29 +255,6 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         }
     }
 
-    const changeBlockSize = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value
-        if (value.includes(".")) return
-        if (value.length > 5) return
-        if (Number.isNaN(Number(value))) return
-        setBlockSize(value)
-    }
-
-    const changeBlockSizeKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === "ArrowUp") {
-            setBlockSize((prev: any) => {
-                if (Number(prev) * 2 > 9999) return Number(prev)
-                if (Number(prev) === 0) return 1
-                return Number(prev) * 2
-            })
-        } else if (event.key === "ArrowDown") {
-            setBlockSize((prev: any) => {
-                if (Number(prev) === 1) return 0
-                return Math.round(Number(prev) / 2)
-            })
-        }
-    }
-
     const changeThreads = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         if (value.includes(".")) return
@@ -332,8 +305,18 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     }
 
     const getUpscaler = () => {
-        if (upscaler === "real-esrgan") return "Real-ESRGAN Anime"
-        return upscaler
+        if (upscaler === "waifu2x") return "waifu2x"
+        if (upscaler === "real-esrgan") return "Real-ESRGAN"
+        if (upscaler === "real-cugan") return "Real-CUGAN"
+        return path.basename(upscaler, path.extname(upscaler))
+    }
+
+    const pythonModelsJSX = () => {
+        let jsx = [] as any
+        for (let i = 0; i < pythonModels.length; i++) {
+            jsx.push(<Dropdown.Item active={upscaler === pythonModels[i]} onClick={() => setUpscaler(pythonModels[i])}>{path.basename(pythonModels[i], path.extname(pythonModels[i]))}</Dropdown.Item>)
+        }
+        return jsx
     }
 
     if (advSettings) {
@@ -348,7 +331,9 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                             <p className="settings-text">Upscaler: </p>
                             <DropdownButton className="btn-filter" title={getUpscaler()} drop="down">
                                 <Dropdown.Item active={upscaler === "waifu2x"} onClick={() => setUpscaler("waifu2x")}>waifu2x</Dropdown.Item>
-                                <Dropdown.Item active={upscaler === "real-esrgan"} onClick={() => setUpscaler("real-esrgan")}>Real-ESRGAN Anime</Dropdown.Item>
+                                <Dropdown.Item active={upscaler === "real-esrgan"} onClick={() => setUpscaler("real-esrgan")}>Real-ESRGAN</Dropdown.Item>
+                                <Dropdown.Item active={upscaler === "real-cugan"} onClick={() => setUpscaler("real-cugan")}>Real-CUGAN</Dropdown.Item>
+                                {pythonModelsJSX()}
                             </DropdownButton>
                         </div>
                         <div className="settings-row">
@@ -400,18 +385,6 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                         <div className="settings-row">
                             <p className="settings-text">Parallel Frames: </p>
                             <input className="settings-input" type="text" spellCheck="false" value={parallelFrames} onChange={changeParallelFrames} onKeyDown={changeParallelFramesKey}/>
-                        </div>
-                        <div className="settings-row">
-                            <p className="settings-text">Disable GPU? </p>
-                            <img src={disableGPU ? checkboxChecked : checkbox} onClick={() => setDisableGPU((prev: boolean) => !prev)} className="settings-checkbox"/>
-                        </div>
-                        <div className="settings-row">
-                            <p className="settings-text">Force OpenCL? </p>
-                            <img src={forceOpenCL ? checkboxChecked : checkbox} onClick={() => setForceOpenCL((prev: boolean) => !prev)} className="settings-checkbox"/>
-                        </div>
-                        <div className="settings-row">
-                            <p className="settings-text">Block Size: </p>
-                            <input className="settings-input" type="text" spellCheck="false" value={blockSize} onChange={changeBlockSize} onKeyDown={changeBlockSizeKey}/>
                         </div>
                         <div className="settings-row">
                             <p className="settings-text">Threads: </p>

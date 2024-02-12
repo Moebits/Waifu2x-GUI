@@ -18,14 +18,23 @@ let window: Electron.BrowserWindow | null
 let ffmpegPath = undefined as any
 if (process.platform === "linux") ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg")
 if (process.platform === "darwin") ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg.app")
-if (process.platform === "win32") ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg.exe") 
+if (process.platform === "win32") ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg.exe")
+let modelPath = undefined as any
+if (process.platform === "linux") modelPath = path.join(app.getAppPath(), "../../models")
+if (process.platform === "darwin") modelPath = path.join(app.getAppPath(), "../../models")
+if (process.platform === "win32") modelPath = path.join(app.getAppPath(), "../../models")
 let waifu2xPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/waifu2x")
 let esrganPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/real-esrgan")
+let cuganPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/real-cugan")
 let webpPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/webp")
+let scriptsPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/scripts")
 if (!fs.existsSync(ffmpegPath)) ffmpegPath = undefined
+if (!fs.existsSync(modelPath)) modelPath = path.join(__dirname, "../models")
 if (!fs.existsSync(waifu2xPath)) waifu2xPath = path.join(__dirname, "../waifu2x")
 if (!fs.existsSync(esrganPath)) esrganPath = path.join(__dirname, "../real-esrgan")
+if (!fs.existsSync(cuganPath)) cuganPath = path.join(__dirname, "../real-cugan")
 if (!fs.existsSync(webpPath)) webpPath = path.join(__dirname, "../webp")
+if (!fs.existsSync(scriptsPath)) scriptsPath = path.join(__dirname, "../scripts")
 autoUpdater.autoDownload = false
 const store = new Store()
 
@@ -194,10 +203,7 @@ const upscale = async (info: any) => {
     jpgWebpQuality: Number(info.jpgQuality),
     pngCompression: Number(info.pngCompression),
     threads: Number(info.threads),
-    disableGPU: info.disableGPU,
-    forceOpenCL: info.forceOpenCL,
     rename: info.rename,
-    blockSize: Number(info.blockSize),
     parallelFrames: Number(info.parallelFrames),
     transparentColor: info.gifTransparency ? "#000000" : undefined,
     pitch: info.pitch,
@@ -206,6 +212,8 @@ const upscale = async (info: any) => {
     ffmpegPath,
     waifu2xPath,
     esrganPath,
+    cuganPath,
+    scriptsPath,
     webpPath
   }
   if (process.platform !== "win32") {
@@ -348,6 +356,10 @@ ipcMain.handle("get-dimensions", async (event, path: string, type: string) => {
   }
 })
 
+ipcMain.handle("get-python-models", (event) => {
+  return fs.readdirSync(modelPath).map((f: string) => path.join(modelPath, f))
+})
+
 ipcMain.handle("add-files", (event, files: string[], identifers: number[]) => {
   window?.webContents.send("add-files", files, identifers)
 })
@@ -416,7 +428,7 @@ if (!singleLock) {
     window.removeMenu()
     if (process.platform !== "win32") {
       if (ffmpegPath) fs.chmodSync(ffmpegPath, "777")
-      waifu2x.chmod777(waifu2xPath, webpPath, esrganPath)
+      waifu2x.chmod777(waifu2xPath, webpPath, esrganPath, cuganPath)
     }
     require("@electron/remote/main").enable(window.webContents)
     window.on("closed", () => {

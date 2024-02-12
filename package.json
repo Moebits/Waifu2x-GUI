@@ -1,6 +1,6 @@
 {
   "name": "waifu2x-gui",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "A gui app that upscales anime-styled images with waifu2x",
   "main": "dist/main.js",
   "scripts": {
@@ -13,6 +13,7 @@
     "release:win": "npm run clean ./build && webpack && npm run sharp:win && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -w -p always",
     "release:linux": "npm run clean ./build && webpack && npm run sharp:linux && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -l -p always",
     "sharp:mac": "del-cli ./node_modules/sharp && npm install --platform=darwin --arch=arm64 sharp",
+    "sharp:mac64": "del-cli ./node_modules/sharp && npm install --platform=darwin --arch=x64 sharp",
     "sharp:win": "del-cli ./node_modules/sharp && npm install --platform=win32 --arch=x64 sharp",
     "sharp:linux": "del-cli ./node_modules/sharp && npm install --platform=linux --arch=x64 sharp"
   },
@@ -38,11 +39,12 @@
     "mac": {
       "target": {
         "target": "dmg",
-        "arch": "x64"
+        "arch": "arm64"
       },
       "category": "public.app-category.utilities",
       "extraFiles": [
-        "ffmpeg/ffmpeg.app"
+        "ffmpeg/ffmpeg.app",
+        "models"
       ]
     },
     "dmg": {
@@ -59,7 +61,8 @@
         "arch": "x64"
       },
       "extraFiles": [
-        "ffmpeg/ffmpeg.exe"
+        "ffmpeg/ffmpeg.exe",
+        "models"
       ]
     },
     "nsis": {
@@ -78,7 +81,8 @@
       },
       "category": "Utility",
       "extraFiles": [
-        "ffmpeg/ffmpeg"
+        "ffmpeg/ffmpeg",
+        "models"
       ]
     },
     "files": [
@@ -91,7 +95,11 @@
       "owner": "Tenpi",
       "releaseType": "draft"
     },
-    "asarUnpack": "node_modules/waifu2x"
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/waifu2x",
+      "node_modules/**/*.node"
+    ]
   },
   "author": "Tenpi",
   "license": "MIT",
@@ -133,6 +141,6 @@
     "react-reorder": "^3.0.0-alpha.7",
     "shade-blend-color": "^1.0.0",
     "sharp": "^0.33.2",
-    "waifu2x": "^1.1.7"
+    "waifu2x": "^1.1.9"
   }
 }
