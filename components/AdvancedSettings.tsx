@@ -3,10 +3,10 @@ import React, {useContext, useEffect, useRef, useState} from "react"
 import checkboxChecked from "../assets/checkbox2-checked.png"
 import checkbox from "../assets/checkbox2.png"
 import {Dropdown, DropdownButton} from "react-bootstrap"
-import {FramerateContext, GIFQualityContext, SDColorSpaceContext, CompressContext,
+import {FramerateContext, GIFQualityContext, SDColorSpaceContext, CompressContext, FPSMultiplierContext,
 GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext, UpscalerContext,
 PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext, QueueContext,
-AdvSettingsContext} from "../renderer"
+AdvSettingsContext, PNGFramesContext} from "../renderer"
 import functions from "../structures/functions"
 import path from "path"
 import "../styles/advancedsettings.less"
@@ -33,6 +33,8 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     const {upscaler, setUpscaler} = useContext(UpscalerContext)
     const {compress, setCompress} = useContext(CompressContext)
     const {advSettings, setAdvSettings} = useContext(AdvSettingsContext)
+    const {fpsMultiplier, setFPSMultiplier} = useContext(FPSMultiplierContext)
+    const {pngFrames, setPNGFrames} = useContext(PNGFramesContext)
     const [pythonModels, setPythonModels] = useState([])
 
     useEffect(() => {
@@ -69,11 +71,13 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
             setSpeed(settings.speed)
             setReverse(settings.reverse)
             setMode(settings.mode)
+            setFPSMultiplier(settings.fpsMultiplier)
             setPitch(settings.pitch)
             setQueue(settings.queue)
             setSDColorSpace(settings.sdColorSpace)
             setUpscaler(settings.upscaler)
             setCompress(settings.compress)
+            setPNGFrames(settings.pngFrames)
         }
         const pythonModels = await ipcRenderer.invoke("get-python-models")
         if (pythonModels.length) setPythonModels(pythonModels)
@@ -81,7 +85,8 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     }
 
     useEffect(() => {
-        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, pngCompression, jpgQuality, parallelFrames, threads, queue, sdColorSpace, upscaler, compress})
+        ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, 
+        pngCompression, jpgQuality, parallelFrames, threads, queue, sdColorSpace, upscaler, compress, pngFrames})
         functions.logoDrag(!advSettings)
     })
 
@@ -106,11 +111,13 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setSpeed(1)
         setReverse(false)
         setMode("noise-scale")
+        setFPSMultiplier(1)
         setPitch(true)
         setQueue(1)
         setSDColorSpace(true)
         setUpscaler("waifu2x")
         setCompress(true)
+        setPNGFrames(false)
     }
 
     const changeRename = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -340,12 +347,12 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                             <p className="settings-text">Rename: </p>
                             <input className="settings-input" type="text" spellCheck="false" value={rename} onChange={changeRename}/>
                         </div>
-                        <div className="settings-row">
+                        {/* <div className="settings-row">
                             <p className="settings-text">Framerate: </p>
                             <input className="settings-input" type="text" spellCheck="false" value={framerate} onChange={changeFramerate} onKeyDown={changeFramerateKey}/>
                             <p className="settings-text">Original?</p>
                             <img src={originalFramerate ? checkboxChecked : checkbox} onClick={() => setOriginalFramerate((prev: boolean) => !prev)} className="settings-checkbox"/>
-                        </div>
+                        </div> */}
                         <div className="settings-row">
                             <p className="settings-text">Pitch Audio? </p>
                             <img src={pitch ? checkboxChecked : checkbox} onClick={() => setPitch((prev: boolean) => !prev)} className="settings-checkbox"/>
@@ -377,6 +384,10 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                         <div className="settings-row">
                             <p className="settings-text">Compress to JPG? </p>
                             <img src={compress ? checkboxChecked : checkbox} onClick={() => setCompress((prev: boolean) => !prev)} className="settings-checkbox"/>
+                        </div>
+                        <div className="settings-row">
+                            <p className="settings-text">PNG Frames? </p>
+                            <img src={pngFrames ? checkboxChecked : checkbox} onClick={() => setPNGFrames((prev: boolean) => !prev)} className="settings-checkbox"/>
                         </div>
                         <div className="settings-row">
                                 <p className="settings-text">Concurrent Upscales: </p>

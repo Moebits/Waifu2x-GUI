@@ -18,7 +18,7 @@ import stopButtonHover from "../assets/stopButton-hover.png"
 import stopButton from "../assets/stopButton.png"
 import trashButtonHover from "../assets/trashButton-hover.png"
 import trashButton from "../assets/trashButton.png"
-import {DirectoryContext, FramerateContext, SDColorSpaceContext, UpscalerContext, CompressContext,
+import {DirectoryContext, FramerateContext, SDColorSpaceContext, UpscalerContext, CompressContext, FPSMultiplierContext, PNGFramesContext,
 GIFQualityContext, GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext,
 PitchContext, PNGCompressionContext, PreviewContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext} from "../renderer"
 import functions from "../structures/functions"
@@ -44,6 +44,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const {scale} = useContext(ScaleContext)
     const {noise} = useContext(NoiseContext)
     const {mode} = useContext(ModeContext)
+    const {fpsMultiplier, setFPSMultiplier} = useContext(FPSMultiplierContext)
     const {speed} = useContext(SpeedContext)
     const {reverse} = useContext(ReverseContext)
     const {originalFramerate} = useContext(OriginalFramerateContext)
@@ -61,6 +62,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const {sdColorSpace} = useContext(SDColorSpaceContext)
     const {gifTransparency} = useContext(GIFTransparencyContext)
     const {previewVisible} = useContext(PreviewContext)
+    const {pngFrames, setPNGFrames} = useContext(PNGFramesContext)
     const [hover, setHover] = useState(false)
     const [hoverClose, setHoverClose] = useState(false)
     const [hoverLocation, setHoverLocation] = useState(false)
@@ -72,6 +74,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const [stopped, setStopped] = useState(false)
     const [deleted, setDeleted] = useState(false)
     const [progress, setProgress] = useState(null) as any
+    const [interlopProgress, setInterlopProgress] = useState(null) as any
     const [frame, setFrame] = useState("")
     const [frames, setFrames] = useState("")
     const [progressColor, setProgressColor] = useState("")
@@ -105,6 +108,14 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
                 }
             }
         }
+        const interpolationProgress = (event: any, info: {id: number, percent?: number}) => {
+            if (info.id === props.id) {
+                const newProgress = info.percent
+                if (interlopProgress !== newProgress) {
+                    setInterlopProgress(newProgress)
+                }
+            }
+        }
         const conversionFinished = (event: any, info: {id: number, output: string}) => {
             if (info.id === props.id) {
                 setOutput(info.output)
@@ -125,6 +136,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         }
         ipcRenderer.on("conversion-started", conversionStarted)
         ipcRenderer.on("conversion-progress", conversionProgress)
+        ipcRenderer.on("interpolation-progress", interpolationProgress)
         ipcRenderer.on("conversion-finished", conversionFinished)
         ipcRenderer.on("start-all", startAll)
         ipcRenderer.on("clear-all", clearAll)
@@ -133,6 +145,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         return () => {
             ipcRenderer.removeListener("conversion-started", conversionStarted)
             ipcRenderer.removeListener("conversion-progress", conversionProgress)
+            ipcRenderer.removeListener("interpolation-progress", interpolationProgress)
             ipcRenderer.removeListener("conversion-finished", conversionFinished)
             ipcRenderer.removeListener("start-all", startAll)
             ipcRenderer.removeListener("clear-all", clearAll)
@@ -151,9 +164,9 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const startConversion = (startAll?: boolean) => {
         if (started) return
         setStartSignal(false)
-        const fps = originalFramerate ? props.framerate : framerate
+        let fps = props.framerate! * fpsMultiplier
         const quality = props.type === "gif" ? gifQuality : videoQuality
-        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, pitch, scale, noise, mode, speed, reverse, quality, rename, pngCompression, jpgQuality, parallelFrames, threads, upscaler, compress, gifTransparency, sdColorSpace}, startAll)
+        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, pitch, scale, noise, mode, fpsMultiplier, speed, reverse, quality, rename, pngCompression, jpgQuality, parallelFrames, threads, upscaler, compress, gifTransparency, sdColorSpace, pngFrames}, startAll)
         setLockedStats({framerate: fps, noise, scale, mode, speed, reverse})
         if (!startAll) {
             setStarted(true)
@@ -236,9 +249,20 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
             jsx = <p className="file-text-progress">Upscaling... {progress.toFixed(2)}%</p>
             progressJSX = <ProgressBar ref={progressBarRef} animated now={progress}/>
         }
-        if (progress === 100) {
-            jsx = <p className="file-text-progress black">Finalizing...</p>
-            progressJSX = <ProgressBar ref={progressBarRef} animated now={100}/>
+        if (interlopProgress !== null) {
+            jsx = <p className="file-text-progress">Interpolating... {interlopProgress.toFixed(2)}%</p>
+            progressJSX = <ProgressBar ref={progressBarRef} animated now={interlopProgress}/>
+        }
+        if (fpsMultiplier !== 1 && props.type === "video") {
+            if (interlopProgress === 100) {
+                jsx = <p className="file-text-progress black">Finalizing...</p>
+                progressJSX = <ProgressBar ref={progressBarRef} animated now={100}/>
+            }
+        } else {
+            if (progress === 100) {
+                jsx = <p className="file-text-progress black">Finalizing...</p>
+                progressJSX = <ProgressBar ref={progressBarRef} animated now={100}/>
+            }
         }
         if (output) {
             jsx = <p className="file-text-progress black">Finished</p>
@@ -350,7 +374,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
                             <div className="file-info">
                                 <p className="file-text" onMouseDown={(event) => event.stopPropagation()}>Speed: {started ? lockedStats.speed : speed}</p>
                                 <p className="file-text margin-left" onMouseDown={(event) => event.stopPropagation()}>Reverse: {started ? (lockedStats.reverse ? "yes" : "no") : (reverse ? "yes" : "no")}</p>
-                                {props.framerate ? <p className="file-text margin-left" onMouseDown={(event) => event.stopPropagation()}>Framerate: {started ? lockedStats.framerate : (originalFramerate ? props.framerate : framerate)}</p> : null}
+                                {props.framerate ? <p className="file-text margin-left" onMouseDown={(event) => event.stopPropagation()}>Framerate: {started ? lockedStats.framerate : props.framerate * fpsMultiplier}</p> : null}
                             </div>
                         </div>
                         <div className="file-info-col">

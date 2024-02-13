@@ -27,6 +27,7 @@ let waifu2xPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules
 let esrganPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/real-esrgan")
 let cuganPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/real-cugan")
 let webpPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/webp")
+let rifePath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/rife-fps/rife")
 let scriptsPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/scripts")
 if (!fs.existsSync(ffmpegPath)) ffmpegPath = undefined
 if (!fs.existsSync(modelPath)) modelPath = path.join(__dirname, "../models")
@@ -35,6 +36,7 @@ if (!fs.existsSync(esrganPath)) esrganPath = path.join(__dirname, "../real-esrga
 if (!fs.existsSync(cuganPath)) cuganPath = path.join(__dirname, "../real-cugan")
 if (!fs.existsSync(webpPath)) webpPath = path.join(__dirname, "../webp")
 if (!fs.existsSync(scriptsPath)) scriptsPath = path.join(__dirname, "../scripts")
+if (!fs.existsSync(rifePath)) rifePath = path.join(__dirname, "../rife")
 autoUpdater.autoDownload = false
 const store = new Store()
 
@@ -196,10 +198,11 @@ const upscale = async (info: any) => {
     noise: Number(info.noise) as any,
     scale: Number(info.scale),
     mode: info.mode,
+    fpsMultiplier: Number(info.fpsMultiplier),
     quality: Number(info.quality),
     speed: Number(info.speed),
     reverse: info.reverse,
-    framerate: Number(info.framerate),
+    framerate: null as any,
     jpgWebpQuality: Number(info.jpgQuality),
     pngCompression: Number(info.pngCompression),
     threads: Number(info.threads),
@@ -209,11 +212,13 @@ const upscale = async (info: any) => {
     pitch: info.pitch,
     sdColorSpace: info.sdColorSpace,
     upscaler: info.upscaler,
+    pngFrames: info.pngFrames,
     ffmpegPath,
     waifu2xPath,
     esrganPath,
     cuganPath,
     scriptsPath,
+    rifePath,
     webpPath
   }
   if (process.platform !== "win32") {
@@ -250,6 +255,9 @@ const upscale = async (info: any) => {
       if (action === "stop") return true
     }
     window?.webContents.send("conversion-progress", {id: info.id, current, total, frame})
+  }
+  const interlopProgress = (percent: number) => {
+    window?.webContents.send("interpolation-progress", {id: info.id, percent})
   }
   history.push({id: info.id, source: info.source, dest, type: info.type})
   active.push({id: info.id, source: info.source, dest, type: info.type, action: null})
@@ -288,7 +296,7 @@ const upscale = async (info: any) => {
     } else if (info.type === "animated webp") {
       output = await waifu2x.upscaleAnimatedWebp(info.source, dest, options, progress)
     } else if (info.type === "video") {
-      output = await waifu2x.upscaleVideo(info.source, dest, options, progress)
+      output = await waifu2x.upscaleVideo(info.source, dest, options, progress, interlopProgress)
     }
   } catch (error) {
       window?.webContents.send("debug", error)
@@ -357,7 +365,7 @@ ipcMain.handle("get-dimensions", async (event, path: string, type: string) => {
 })
 
 ipcMain.handle("get-python-models", (event) => {
-  return fs.readdirSync(modelPath).map((f: string) => path.join(modelPath, f))
+  return fs.readdirSync(modelPath).filter((f: string) => f !== ".DS_Store").map((f: string) => path.join(modelPath, f))
 })
 
 ipcMain.handle("add-files", (event, files: string[], identifers: number[]) => {
@@ -428,7 +436,7 @@ if (!singleLock) {
     window.removeMenu()
     if (process.platform !== "win32") {
       if (ffmpegPath) fs.chmodSync(ffmpegPath, "777")
-      waifu2x.chmod777(waifu2xPath, webpPath, esrganPath, cuganPath)
+      waifu2x.chmod777(waifu2xPath, webpPath, esrganPath, cuganPath, rifePath)
     }
     require("@electron/remote/main").enable(window.webContents)
     window.on("closed", () => {

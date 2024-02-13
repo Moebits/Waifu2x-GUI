@@ -18,6 +18,7 @@ export const DirectoryContext = React.createContext<any>(null)
 export const NoiseContext = React.createContext<any>(null)
 export const ScaleContext = React.createContext<any>(null)
 export const ModeContext = React.createContext<any>(null)
+export const FPSMultiplierContext = React.createContext<any>(null)
 export const SpeedContext = React.createContext<any>(null)
 export const ReverseContext = React.createContext<any>(null)
 export const ClearAllContext = React.createContext<any>(null)
@@ -38,6 +39,7 @@ export const PreviewContext = React.createContext<any>(null)
 export const QueueContext = React.createContext<any>(null)
 export const UpscalerContext = React.createContext<any>(null)
 export const CompressContext = React.createContext<any>(null)
+export const PNGFramesContext = React.createContext<any>(null)
 export const AdvSettingsContext = React.createContext<any>(null)
 
 const App = () => {
@@ -45,6 +47,7 @@ const App = () => {
   const [noise, setNoise] = useState(2)
   const [scale, setScale] = useState(2)
   const [mode, setMode] = useState("noise-scale")
+  const [fpsMultiplier, setFPSMultiplier] = useState(1)
   const [speed, setSpeed] = useState(1)
   const [reverse, setReverse] = useState(false)
   const [clearAll, setClearAll] = useState(false)
@@ -64,6 +67,7 @@ const App = () => {
   const [queue, setQueue] = useState(1)
   const [upscaler, setUpscaler] = useState("waifu2x")
   const [compress, setCompress] = useState(true)
+  const [pngFrames, setPNGFrames] = useState(false)
   const [advSettings, setAdvSettings] = useState(false)
 
   const [previewVisible, setPreviewVisible] = useState(false)
@@ -74,6 +78,8 @@ const App = () => {
 
   return (
     <main className="app">
+      <PNGFramesContext.Provider value={{pngFrames, setPNGFrames}}>
+      <FPSMultiplierContext.Provider value={{fpsMultiplier, setFPSMultiplier}}>
       <AdvSettingsContext.Provider value={{advSettings, setAdvSettings}}>
       <CompressContext.Provider value={{compress, setCompress}}>
       <UpscalerContext.Provider value={{upscaler, setUpscaler}}>
@@ -132,6 +138,8 @@ const App = () => {
       </UpscalerContext.Provider>
       </CompressContext.Provider>
       </AdvSettingsContext.Provider>
+      </FPSMultiplierContext.Provider>
+      </PNGFramesContext.Provider>
     </main>
   )
 }
