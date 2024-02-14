@@ -20,7 +20,7 @@ Warning: Upscaling too many images in parallel can cause your computer to freeze
 
 ### Waifu2x
 
-Waifu2x only supports scale factors in multiples of 2 from 1/2/4/8/16/32 and noise level -1/0/1/2/3 (set to -1 for no denoise).
+Waifu2x only supports scale factors in multiples of 2 from 1/2/4 and noise level -1/0/1/2/3 (set to -1 for no denoise).
 
 ### Real-ESRGAN
 
