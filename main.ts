@@ -257,6 +257,11 @@ const upscale = async (info: any) => {
     window?.webContents.send("conversion-progress", {id: info.id, current, total, frame})
   }
   const interlopProgress = (percent: number) => {
+    const index = active.findIndex((e) => e.id === info.id)
+    if (index !== -1) {
+      const action = active[index].action
+      if (action === "stop") return true
+    }
     window?.webContents.send("interpolation-progress", {id: info.id, percent})
   }
   history.push({id: info.id, source: info.source, dest, type: info.type})

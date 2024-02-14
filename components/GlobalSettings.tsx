@@ -20,8 +20,8 @@ const DirectoryBar: React.FunctionComponent = (props) => {
 
     const handleNoise = (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.value
-        if (value.length > 1) return
-        if (Number.isNaN(Number(value))) return
+        if (value.length > 2) return
+        if (Number.isNaN(Number(value.replace("-", "")))) return
         if (Number(value) > 3) value = "3"
         setNoise(value.replace(".", ""))
     }
@@ -34,7 +34,7 @@ const DirectoryBar: React.FunctionComponent = (props) => {
             })
         } else if (event.key === "ArrowDown") {
             setNoise((prev: any) => {
-                if (Number(prev) - 1 < 0) return Number(prev)
+                if (Number(prev) - 1 < -1) return Number(prev)
                 return Number(prev) - 1
             })
         }

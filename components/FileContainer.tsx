@@ -112,7 +112,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
             if (info.id === props.id) {
                 const newProgress = info.percent
                 if (interlopProgress !== newProgress) {
-                    setInterlopProgress(newProgress)
+                    if (newProgress) setInterlopProgress(newProgress)
                 }
             }
         }
@@ -366,15 +366,15 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
                     <div className="file-info">
                             <p className="file-text" onMouseDown={(event) => event.stopPropagation()}>Noise: {started ? lockedStats.noise : noise}</p>
                             <p className="file-text margin-left" onMouseDown={(event) => event.stopPropagation()}>Scale: {started ? lockedStats.scale : scale}</p>
-                            <p className="file-text margin-left" onMouseDown={(event) => event.stopPropagation()}>Mode: {started ? lockedStats.mode : mode}</p>
+                            {/*<p className="file-text margin-left" onMouseDown={(event) => event.stopPropagation()}>Mode: {started ? lockedStats.mode : mode}</p>*/}
                     </div>
                     {props.type !== "image" ?
                     <div className="file-info-col-container">
                         <div className="file-info-col">
                             <div className="file-info">
-                                <p className="file-text" onMouseDown={(event) => event.stopPropagation()}>Speed: {started ? lockedStats.speed : speed}</p>
+                                {props.framerate ? <p className="file-text" onMouseDown={(event) => event.stopPropagation()}>Framerate: {started ? lockedStats.framerate : props.framerate * fpsMultiplier}</p> : null}
+                                <p className="file-text margin-left" onMouseDown={(event) => event.stopPropagation()}>Speed: {started ? lockedStats.speed : speed}</p>
                                 <p className="file-text margin-left" onMouseDown={(event) => event.stopPropagation()}>Reverse: {started ? (lockedStats.reverse ? "yes" : "no") : (reverse ? "yes" : "no")}</p>
-                                {props.framerate ? <p className="file-text margin-left" onMouseDown={(event) => event.stopPropagation()}>Framerate: {started ? lockedStats.framerate : props.framerate * fpsMultiplier}</p> : null}
                             </div>
                         </div>
                         <div className="file-info-col">
