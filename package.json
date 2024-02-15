@@ -1,6 +1,6 @@
 {
   "name": "waifu2x-gui",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "A gui app that upscales anime-styled images with waifu2x",
   "main": "dist/main.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "clean": "del-cli ./dist",
     "build": "npm run clean ./build && webpack && electron-builder -p never",
     "build-fast": "webpack && electron-builder -p never",
-    "rebuild": "npm rebuild --runtime=electron --target=14.0.0 --disturl=https://atom.io/download/atom-shell --abi=83",
+    "rebuild": "electron-rebuild -f -w canvas",
     "release": "npm run release:win && npm run release:linux && npm run release:mac",
     "release:mac": "npm run clean ./build && webpack && npm run sharp:mac && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -m -p always",
     "release:win": "npm run clean ./build && webpack && npm run sharp:win && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -w -p always",
@@ -105,10 +105,12 @@
   "author": "Tenpi",
   "license": "MIT",
   "devDependencies": {
+    "@electron/rebuild": "^3.6.0",
     "@tenpi/tslint": "^1.1.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/sharp": "^0.31.1",
+    "copy-webpack-plugin": "^9.1.0",
     "cross-env": "^7.0.3",
     "css-loader": "^5.0.1",
     "del-cli": "^3.0.1",
@@ -131,6 +133,7 @@
   "dependencies": {
     "@electron/remote": "^2.1.2",
     "bootstrap": "^4.6.0",
+    "canvas": "^2.11.2",
     "electron-store": "^7.0.1",
     "electron-updater": "^4.3.5",
     "image-size": "^0.9.3",
@@ -142,6 +145,6 @@
     "react-reorder": "^3.0.0-alpha.7",
     "shade-blend-color": "^1.0.0",
     "sharp": "^0.33.2",
-    "waifu2x": "^1.2.6"
+    "waifu2x": "^1.2.9"
   }
 }

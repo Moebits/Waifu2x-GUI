@@ -11,7 +11,7 @@ const Preview: React.FunctionComponent = (props) => {
     const {previewVisible, setPreviewVisible} = useContext(PreviewContext)
 
     useEffect(() => {
-        const preview = (event: any, image: string, type: "image" | "gif" | "video") => {
+        const preview = (event: any, image: string, type: "image" | "gif" | "video" | "pdf") => {
             if (image) {
                 functions.logoDrag(false)
                 setSrc(image)

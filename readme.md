@@ -11,6 +11,7 @@ Note: Upscaling videos and gifs will take a very long time without a high-end gr
 - Upscale and/or denoise images (png, jpg, webp, etc.)
 - Upscale and/or denoise animated images (gif, animated webp)
 - Upscale and/or denoise videos (mp4, webm, ogv, etc.)
+- Upscale and/or denoise PDFs (pdf)
 - Apply effects such as speed or reverse (animated images/videos)
 - Customize settings (noise, scale, mode, framerate, etc.)
 - Upscale multiple images (or multiple frames of an animated image/video) concurrently

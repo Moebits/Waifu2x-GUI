@@ -30,6 +30,7 @@ export default class Functions {
     }
 
     public static getType = (str: string) => {
+        if (str.includes(".pdf")) return "pdf"
         if (str.includes(".webp")) {
             if (Functions.isAnimatedWebp(str)) {
                 return "animated webp"

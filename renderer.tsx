@@ -40,6 +40,7 @@ export const QueueContext = React.createContext<any>(null)
 export const UpscalerContext = React.createContext<any>(null)
 export const CompressContext = React.createContext<any>(null)
 export const PNGFramesContext = React.createContext<any>(null)
+export const PDFDownscaleContext = React.createContext<any>(null)
 export const AdvSettingsContext = React.createContext<any>(null)
 
 const App = () => {
@@ -68,6 +69,7 @@ const App = () => {
   const [upscaler, setUpscaler] = useState("waifu2x")
   const [compress, setCompress] = useState(true)
   const [pngFrames, setPNGFrames] = useState(false)
+  const [pdfDownscale, setPDFDownscale] = useState(0)
   const [advSettings, setAdvSettings] = useState(false)
 
   const [previewVisible, setPreviewVisible] = useState(false)
@@ -78,6 +80,7 @@ const App = () => {
 
   return (
     <main className="app">
+      <PDFDownscaleContext.Provider value={{pdfDownscale, setPDFDownscale}}>
       <PNGFramesContext.Provider value={{pngFrames, setPNGFrames}}>
       <FPSMultiplierContext.Provider value={{fpsMultiplier, setFPSMultiplier}}>
       <AdvSettingsContext.Provider value={{advSettings, setAdvSettings}}>
@@ -140,6 +143,7 @@ const App = () => {
       </AdvSettingsContext.Provider>
       </FPSMultiplierContext.Provider>
       </PNGFramesContext.Provider>
+      </PDFDownscaleContext.Provider>
     </main>
   )
 }

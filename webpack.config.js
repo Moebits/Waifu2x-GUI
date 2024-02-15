@@ -2,6 +2,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 const TerserJSPlugin = require("terser-webpack-plugin")
+const CopyPlugin = require("copy-webpack-plugin")
 const path = require("path")
 const webpack = require("webpack")
 const exclude = [/node_modules/, /dist/]
@@ -28,7 +29,12 @@ module.exports = [
       new ForkTsCheckerWebpackPlugin(),
       new HtmlWebpackPlugin({template: path.resolve(__dirname, "./index.html"), minify: true}),
       new MiniCssExtractPlugin({filename: "styles.css", chunkFilename: "styles.css"}),
-      new webpack.DefinePlugin({"process.env.FLUENTFFMPEG_COV": false})
+      new webpack.DefinePlugin({"process.env.FLUENTFFMPEG_COV": false}),
+      new CopyPlugin({
+        patterns: [
+          {from: "structures/pdf.worker.js", to: "[name][ext]"}
+        ]
+      })
     ],
     devServer: {contentBase: path.join(__dirname, "./dist"), port: 9000, compress: true, hot: true, historyApiFallback: true, publicPath: "/"},
   },
@@ -44,7 +50,8 @@ module.exports = [
     module: {
       rules: [
           {test: /\.(jpe?g|png|gif|svg|mp3|wav|mp4|yml|txt)$/, exclude, use: [{loader: "file-loader", options: {name: "[path][name].[ext]"}}]},
-          {test: /\.(tsx?|jsx?)$/, exclude, use: [{loader: "ts-loader", options: {transpileOnly: true}}]}
+          {test: /\.(tsx?|jsx?)$/, exclude, use: [{loader: "ts-loader", options: {transpileOnly: true}}]},
+          {test: /\.node$/, loader: "node-loader"}
       ]
     },
     plugins: [

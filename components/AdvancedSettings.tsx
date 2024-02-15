@@ -6,7 +6,7 @@ import {Dropdown, DropdownButton} from "react-bootstrap"
 import {FramerateContext, GIFQualityContext, SDColorSpaceContext, CompressContext, FPSMultiplierContext,
 GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext, UpscalerContext,
 PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext, QueueContext,
-AdvSettingsContext, PNGFramesContext} from "../renderer"
+AdvSettingsContext, PNGFramesContext, PDFDownscaleContext} from "../renderer"
 import functions from "../structures/functions"
 import path from "path"
 import "../styles/advancedsettings.less"
@@ -35,6 +35,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     const {advSettings, setAdvSettings} = useContext(AdvSettingsContext)
     const {fpsMultiplier, setFPSMultiplier} = useContext(FPSMultiplierContext)
     const {pngFrames, setPNGFrames} = useContext(PNGFramesContext)
+    const {pdfDownscale, setPDFDownscale} = useContext(PDFDownscaleContext)
     const [pythonModels, setPythonModels] = useState([])
 
     useEffect(() => {
@@ -78,15 +79,15 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
             setUpscaler(settings.upscaler)
             setCompress(settings.compress)
             setPNGFrames(settings.pngFrames)
+            setPDFDownscale(settings.pdfDownscale)
         }
         const pythonModels = await ipcRenderer.invoke("get-python-models")
         if (pythonModels.length) setPythonModels(pythonModels)
-        console.log(pythonModels)
     }
 
     useEffect(() => {
         ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, 
-        pngCompression, jpgQuality, parallelFrames, threads, queue, sdColorSpace, upscaler, compress, pngFrames})
+        pngCompression, jpgQuality, parallelFrames, threads, queue, sdColorSpace, upscaler, compress, pngFrames, pdfDownscale})
         functions.logoDrag(!advSettings)
     })
 
@@ -118,6 +119,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setUpscaler("waifu2x")
         setCompress(true)
         setPNGFrames(false)
+        setPDFDownscale(0)
     }
 
     const changeRename = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -236,6 +238,26 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
             setJPGQuality((prev: any) => {
                 if (Number(prev) - 1 < 0) return Number(prev)
                 return Number(prev) - 1
+            })
+        }
+    }
+
+    const changePDFDownscale = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value
+        if (value.includes(".")) return
+        if (Number.isNaN(Number(value))) return
+        setPDFDownscale(value)
+    }
+
+    const changePDFDownscaleKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowUp") {
+            setPDFDownscale((prev: any) => {
+                return Number(prev) + 100
+            })
+        } else if (event.key === "ArrowDown") {
+            setPDFDownscale((prev: any) => {
+                if (Number(prev) - 100 < 0) return Number(prev)
+                return Number(prev) - 100
             })
         }
     }
@@ -388,6 +410,10 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                         <div className="settings-row">
                             <p className="settings-text">PNG Frames? </p>
                             <img src={pngFrames ? checkboxChecked : checkbox} onClick={() => setPNGFrames((prev: boolean) => !prev)} className="settings-checkbox"/>
+                        </div>
+                        <div className="settings-row">
+                            <p className="settings-text">PDF Downscale: </p>
+                            <input className="settings-input" type="text" spellCheck="false" value={pdfDownscale} onChange={changePDFDownscale} onKeyDown={changePDFDownscaleKey}/>
                         </div>
                         <div className="settings-row">
                                 <p className="settings-text">Concurrent Upscales: </p>

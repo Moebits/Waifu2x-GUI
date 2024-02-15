@@ -19,7 +19,7 @@ import stopButton from "../assets/stopButton.png"
 import trashButtonHover from "../assets/trashButton-hover.png"
 import trashButton from "../assets/trashButton.png"
 import {DirectoryContext, FramerateContext, SDColorSpaceContext, UpscalerContext, CompressContext, FPSMultiplierContext, PNGFramesContext,
-GIFQualityContext, GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext,
+GIFQualityContext, GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext, PDFDownscaleContext,
 PitchContext, PNGCompressionContext, PreviewContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext} from "../renderer"
 import functions from "../structures/functions"
 import "../styles/filecontainer.less"
@@ -28,11 +28,12 @@ interface FileContainerProps {
     id: number
     remove: (id: number) => void
     setStart: (id: number) => void
-    type: "image" | "gif" | "animated webp" | "video"
+    type: "image" | "gif" | "animated webp" | "video" | "pdf"
     source: string
     height: number
     width: number
     framerate?: number
+    image?: string
 }
 
 let realEvent = true
@@ -63,6 +64,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const {gifTransparency} = useContext(GIFTransparencyContext)
     const {previewVisible} = useContext(PreviewContext)
     const {pngFrames, setPNGFrames} = useContext(PNGFramesContext)
+    const {pdfDownscale, setPDFDownscale} = useContext(PDFDownscaleContext)
     const [hover, setHover] = useState(false)
     const [hoverClose, setHoverClose] = useState(false)
     const [hoverLocation, setHoverLocation] = useState(false)
@@ -70,6 +72,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const [hoverStart, setHoverStart] = useState(false)
     const [hoverStop, setHoverStop] = useState(false)
     const [output, setOutput] = useState("")
+    const [outputImage, setOutputImage] = useState("")
     const [started, setStarted] = useState(false)
     const [stopped, setStopped] = useState(false)
     const [deleted, setDeleted] = useState(false)
@@ -116,9 +119,10 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
                 }
             }
         }
-        const conversionFinished = (event: any, info: {id: number, output: string}) => {
+        const conversionFinished = (event: any, info: {id: number, output: string, outputImage?: string}) => {
             if (info.id === props.id) {
                 setOutput(info.output)
+                if (info.outputImage) setOutputImage(info.outputImage)
                 setFrame("")
                 setShowNew(true)
             }
@@ -166,7 +170,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         setStartSignal(false)
         let fps = props.framerate! * fpsMultiplier
         const quality = props.type === "gif" ? gifQuality : videoQuality
-        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, pitch, scale, noise, mode, fpsMultiplier, speed, reverse, quality, rename, pngCompression, jpgQuality, parallelFrames, threads, upscaler, compress, gifTransparency, sdColorSpace, pngFrames}, startAll)
+        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, pitch, scale, noise, mode, fpsMultiplier, speed, reverse, quality, rename, pngCompression, jpgQuality, parallelFrames, threads, upscaler, compress, gifTransparency, sdColorSpace, pngFrames, pdfDownscale}, startAll)
         setLockedStats({framerate: fps, noise, scale, mode, speed, reverse})
         if (!startAll) {
             setStarted(true)
@@ -294,7 +298,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     }
 
     const preview = (event: React.MouseEvent<HTMLElement>) => {
-        const source = showNew ? output : props.source
+        const source = getSource()
         if (event.ctrlKey) return ipcRenderer.invoke("add-file", source, props.id)
         if (event.button === 2 && !drag) {
             if (frame) return ipcRenderer.invoke("preview", frame, "image")
@@ -336,13 +340,42 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         }
     }
 
+    const getSource = () => {
+        if (props.type === "pdf") return showNew ? outputImage : props.image
+        return showNew ? output : props.source
+    }
+
     const getThumbnail = () => {
         if (props.type === "video") {
             if (frame) return <img className="file-img" onMouseDown={delayPress} onMouseUp={preview} src={frame}/>
-            return <video className="file-img" onMouseDown={delayPress} onMouseUp={preview} muted autoPlay loop><source src={showNew ? output : props.source}></source></video>
+            return <video className="file-img" onMouseDown={delayPress} onMouseUp={preview} muted autoPlay loop><source src={getSource()}></source></video>
         } else {
             if (frame) return <img className="file-img" onMouseDown={delayPress} onMouseUp={preview} src={frame}/>
-            return <img className="file-img" onMouseDown={delayPress} onMouseUp={preview} src={showNew ? output : props.source}/>
+            return <img className="file-img" onMouseDown={delayPress} onMouseUp={preview} src={getSource()}/>
+        }
+    }
+
+    const calcWidth = (final?: boolean) => {
+        if (final) {
+            if (props.type === "pdf" && pdfDownscale && Number(pdfDownscale) > 0) {
+                return Math.floor(((props.width / props.height) * pdfDownscale) * (started ? lockedStats.scale : scale))
+            }
+            return Math.floor(props.width * (started ? lockedStats.scale : scale))
+        } else {
+            if (props.type === "pdf" && pdfDownscale && Number(pdfDownscale) > 0) return Math.floor((props.width / props.height) * pdfDownscale)
+            return props.width
+        }
+    }
+
+    const calcHeight = (final?: boolean) => {
+        if (final) {
+            if (props.type === "pdf" && pdfDownscale && Number(pdfDownscale) > 0) {
+                return Math.floor(pdfDownscale * (started ? lockedStats.scale : scale))
+            }
+            return Math.floor(props.height * (started ? lockedStats.scale : scale))
+        } else {
+            if (props.type === "pdf" && pdfDownscale && Number(pdfDownscale) > 0) return pdfDownscale
+            return props.height
         }
     }
 
@@ -359,9 +392,9 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
                         <img className="file-expand" onMouseDown={(event) => event.stopPropagation()} width="20" height="20" onClick={toggleNew} src={showNew ? contract : expand}/>
                     </div>
                     <div className="file-info">
-                            <p className="file-text" onMouseDown={(event) => event.stopPropagation()}>{props.width}x{props.height}</p>
+                            <p className="file-text" onMouseDown={(event) => event.stopPropagation()}>{calcWidth()}x{calcHeight()}</p>
                             <img className="file-arrow" width="25" height="25" src={arrow} onMouseDown={(event) => event.stopPropagation()}/>
-                            <p className="file-text" onMouseDown={(event) => event.stopPropagation()}>{Math.floor(props.width * (started ? lockedStats.scale : scale))}x{Math.floor(props.height * (started ? lockedStats.scale : scale))}</p>
+                            <p className="file-text" onMouseDown={(event) => event.stopPropagation()}>{calcWidth(true)}x{calcHeight(true)}</p>
                     </div>
                     <div className="file-info">
                             <p className="file-text" onMouseDown={(event) => event.stopPropagation()}>Noise: {started ? lockedStats.noise : noise}</p>

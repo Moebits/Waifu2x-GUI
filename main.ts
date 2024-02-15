@@ -129,10 +129,12 @@ ipcMain.handle("delete-conversion", async (event, id: number, frames: boolean) =
       if (fs.existsSync(dest)) fs.unlinkSync(dest)
     } else {
       if (frames) {
-        const frameDest = `${path.dirname(source)}/${path.basename(source, path.extname(source))}Frames`
+        let frameDest = `${path.dirname(source)}/${path.basename(source, path.extname(source))}Frames`
+        if (type === "pdf") frameDest = `${path.dirname(dest)}/${path.basename(dest, path.extname(dest))}`
         const match = dest.match(/_\d+(?=\.)/)?.[0]
         if (match) {
-          const newFrameDest = `${path.dirname(source)}/${path.basename(source, path.extname(source))}Frames${match}`
+          let newFrameDest = `${path.dirname(source)}/${path.basename(source, path.extname(source))}Frames${match}`
+          if (type === "pdf") newFrameDest = `${path.dirname(dest)}/${path.basename(dest, path.extname(dest))}${match}`
           fs.existsSync(newFrameDest) ? functions.removeDirectory(newFrameDest) : (fs.existsSync(frameDest) ? functions.removeDirectory(frameDest) : null)
         } else {
           if (fs.existsSync(frameDest)) functions.removeDirectory(frameDest)
@@ -213,6 +215,7 @@ const upscale = async (info: any) => {
     sdColorSpace: info.sdColorSpace,
     upscaler: info.upscaler,
     pngFrames: info.pngFrames,
+    downscaleHeight: info.pdfDownscale ? Number(info.pdfDownscale) : undefined,
     ffmpegPath,
     waifu2xPath,
     esrganPath,
@@ -246,9 +249,11 @@ const upscale = async (info: any) => {
     let frame = null
     if (index !== -1) {
       const action = active[index].action
-      const frameDest = `${path.dirname(dest)}/${path.basename(info.source, path.extname(info.source))}Frames`
+      let frameDest = `${path.dirname(dest)}/${path.basename(info.source, path.extname(info.source))}Frames`
+      if (info.type === "pdf") frameDest = `${path.dirname(dest)}/${path.basename(dest, path.extname(dest))}`
       if (fs.existsSync(frameDest)) {
-        let frameArray = fs.readdirSync(frameDest).map((f) => `${frameDest}/${f}`).filter((f) => path.extname(f) === ".png")
+        let frameArray = fs.readdirSync(frameDest).map((f) => `${frameDest}/${f}`).filter((f) => path.extname(f).toLowerCase() === ".png" 
+        || path.extname(f).toLowerCase() === ".jpg" || path.extname(f).toLowerCase() === ".jpeg")
         frameArray = frameArray.sort(new Intl.Collator(undefined, {numeric: true, sensitivity: "base"}).compare)
         frame = frameArray[current]
       }
@@ -268,6 +273,7 @@ const upscale = async (info: any) => {
   active.push({id: info.id, source: info.source, dest, type: info.type, action: null})
   window?.webContents.send("conversion-started", {id: info.id})
   let output = ""
+  let outputImage = ""
   try {
     if (info.type === "image") {
       let meta = []
@@ -302,13 +308,17 @@ const upscale = async (info: any) => {
       output = await waifu2x.upscaleAnimatedWebp(info.source, dest, options, progress)
     } else if (info.type === "video") {
       output = await waifu2x.upscaleVideo(info.source, dest, options, progress, interlopProgress)
+    } else if (info.type === "pdf") {
+      output = await waifu2x.upscalePDF(info.source, dest, options, progress)
+      const dimensions = await waifu2x.pdfDimensions(output, {downscaleHeight: undefined})
+      outputImage = dimensions.image
     }
   } catch (error) {
       window?.webContents.send("debug", error)
       console.log(error)
       output = dest
   }
-  window?.webContents.send("conversion-finished", {id: info.id, output})
+  window?.webContents.send("conversion-finished", {id: info.id, output, outputImage})
   nextQueue(info)
 }
 
@@ -358,11 +368,14 @@ ipcMain.handle("move-queue", async (event, id: number) => {
   }
 })
 
-ipcMain.handle("get-dimensions", async (event, path: string, type: string) => {
+ipcMain.handle("get-dimensions", async (event, path: string, type: string, options?: any) => {
   if (type === "video") {
     const dimensions = await waifu2x.parseResolution(path, ffmpegPath)
     const framerate = await waifu2x.parseFramerate(path, ffmpegPath)
     return {width: dimensions.width, height: dimensions.height, framerate}
+  } else if (type === "pdf") {
+    const dimensions = await waifu2x.pdfDimensions(path, {downscaleHeight: undefined})
+    return {width: dimensions.width, height: dimensions.height, image: dimensions.image}
   } else {
     const dimensions = imageSize(path)
     return {width: dimensions.width, height: dimensions.height}
@@ -392,7 +405,8 @@ ipcMain.handle("select-files", async () => {
       {name: "All Files", extensions: ["*"]},
       {name: "Images", extensions: ["png", "jpg", "jpeg", "webp", "tiff"]},
       {name: "GIF", extensions: ["gif"]},
-      {name: "Videos", extensions: ["mp4", "ogv", "webm", "avi", "mov", "mkv", "flv"]}
+      {name: "Videos", extensions: ["mp4", "ogv", "webm", "avi", "mov", "mkv", "flv"]},
+      {name: "PDF", extensions: ["pdf"]},
     ],
     properties: ["multiSelections", "openFile"]
   })

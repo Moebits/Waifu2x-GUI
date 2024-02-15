@@ -2,13 +2,14 @@ import {ipcRenderer} from "electron"
 import fs from "fs"
 import React, {useContext, useEffect, useState} from "react"
 import Reorder from "react-reorder"
-import {ClearAllContext} from "../renderer"
+import {ClearAllContext, PDFDownscaleContext} from "../renderer"
 import functions from "../structures/functions"
 import "../styles/filecontainerlist.less"
 import FileContainer from "./FileContainer"
 
 const FileContainerList: React.FunctionComponent = (props) => {
     const {clearAll, setClearAll} = useContext(ClearAllContext)
+    const {pdfDownscale, setPDFDownscale} = useContext(PDFDownscaleContext)
     const [containers, setContainers] = useState([] as  Array<{id: number, started: boolean, jsx: any}>)
     const [addSignal, setAddSignal] = useState(null) as any
     useEffect(() => {
@@ -19,10 +20,10 @@ const FileContainerList: React.FunctionComponent = (props) => {
             for (let i = 0; i < files.length; i++) {
                 const type = functions.getType(files[i])
                 if (!type) continue
-                const dimensions = await ipcRenderer.invoke("get-dimensions", files[i], type)
+                const dimensions = await ipcRenderer.invoke("get-dimensions", files[i], type, {pdfDownscale})
                 setContainers((prev) => {
                     let newState = [...prev]
-                    newState = [...newState, {id: identifiers[i], started: false, jsx: <FileContainer key={identifiers[i]} id={identifiers[i]} height={dimensions.height} width={dimensions.width} framerate={dimensions.framerate} source={files[i]} type={type} setStart={setStarted} remove={removeContainer}/>}]
+                    newState = [...newState, {id: identifiers[i], started: false, jsx: <FileContainer key={identifiers[i]} id={identifiers[i]} height={dimensions.height} width={dimensions.width} framerate={dimensions.framerate} image={dimensions.image} source={files[i]} type={type} setStart={setStarted} remove={removeContainer}/>}]
                     return newState
                 })
             }
@@ -33,7 +34,7 @@ const FileContainerList: React.FunctionComponent = (props) => {
             ipcRenderer.removeListener("add-files", addFiles)
             ipcRenderer.removeListener("add-file-id", addFile)
         }
-    }, [])
+    }, [pdfDownscale])
 
     useEffect(() => {
         update()
@@ -47,10 +48,10 @@ const FileContainerList: React.FunctionComponent = (props) => {
         if (index === -1) index = containers.length
         const type = functions.getType(signal.file)
         if (!type) return
-        const dimensions = await ipcRenderer.invoke("get-dimensions", signal.file, type)
+        const dimensions = await ipcRenderer.invoke("get-dimensions", signal.file, type, {pdfDownscale})
         setContainers((prev) => {
             const newState = [...prev]
-            newState.splice(index + 1, 0, {id: signal.id, started: false, jsx: <FileContainer key={signal.id} id={signal.id} height={dimensions.height} width={dimensions.width} framerate={dimensions.framerate} source={signal.file} type={type} setStart={setStarted} remove={removeContainer}/>})
+            newState.splice(index + 1, 0, {id: signal.id, started: false, jsx: <FileContainer key={signal.id} id={signal.id} height={dimensions.height} width={dimensions.width} framerate={dimensions.framerate} image={dimensions.image} source={signal.file} type={type} setStart={setStarted} remove={removeContainer}/>})
             return newState
         })
     }
