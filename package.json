@@ -133,7 +133,6 @@
   "dependencies": {
     "@electron/remote": "^2.1.2",
     "bootstrap": "^4.6.0",
-    "canvas": "^2.11.2",
     "electron-store": "^7.0.1",
     "electron-updater": "^4.3.5",
     "image-size": "^0.9.3",
