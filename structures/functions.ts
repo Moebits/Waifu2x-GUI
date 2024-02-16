@@ -97,4 +97,8 @@ export default class Functions {
         if (max && count > max) return max
         return count
     }
+
+    public static escape = (str: string) => {
+        return path.normalize(str).replace(/(?<!\\)\\(?!\\)/g, "/")
+    }
 }

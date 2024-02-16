@@ -224,7 +224,7 @@ const upscale = async (info: any) => {
     transparentColor: info.gifTransparency ? "#000000" : undefined,
     pitch: info.pitch,
     sdColorSpace: info.sdColorSpace,
-    upscaler: info.upscaler,
+    upscaler: functions.escape(info.upscaler),
     pngFrames: info.pngFrames,
     downscaleHeight: info.pdfDownscale ? Number(info.pdfDownscale) : undefined,
     pythonDownscale: info.pythonDownscale ? Number(info.pythonDownscale) : undefined,
@@ -240,6 +240,7 @@ const upscale = async (info: any) => {
   if (process.platform !== "win32") {
     info.source = info.source.replace("file://", "")
   }
+  info.source = functions.escape(info.source)
   let overwrite = false
   if (info.dest.startsWith("{source}")) {
     if (!options.rename) overwrite = true

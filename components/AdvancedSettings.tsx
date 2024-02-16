@@ -357,6 +357,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     }
 
     const getUpscaler = () => {
+        if (!upscaler) return "waifu2x"
         if (upscaler === "waifu2x") return "waifu2x"
         if (upscaler === "real-esrgan") return "Real-ESRGAN"
         if (upscaler === "real-cugan") return "Real-CUGAN"

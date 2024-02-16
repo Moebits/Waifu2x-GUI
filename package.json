@@ -1,10 +1,11 @@
 {
   "name": "waifu2x-gui",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "A gui app that upscales anime-styled images with waifu2x",
   "main": "dist/main.js",
   "scripts": {
     "start": "npm run clean && webpack && cross-env DEVELOPMENT=true electron dist/main.js",
+    "start-fast": "electron dist/main.js",
     "clean": "del-cli ./dist",
     "build": "npm run clean ./build && webpack && electron-builder -p never",
     "build-fast": "webpack && electron-builder -p never",
@@ -145,6 +146,6 @@
     "react-reorder": "^3.0.0-alpha.7",
     "shade-blend-color": "^1.0.0",
     "sharp": "^0.33.2",
-    "waifu2x": "^1.3.7"
+    "waifu2x": "^1.3.8"
   }
 }

@@ -7,6 +7,7 @@ import folderButton from "../assets/folderButton.png"
 import sourceButtonHover from "../assets/source-hover.png"
 import sourceButton from "../assets/source.png"
 import {DirectoryContext} from "../renderer"
+import functions from "../structures/functions"
 import "../styles/directorybar.less"
 
 const DirectoryBar: React.FunctionComponent = (props) => {
@@ -50,8 +51,9 @@ const DirectoryBar: React.FunctionComponent = (props) => {
 
     const openDirectory = () => {
         if (source) return
-        if (!fs.existsSync(directory)) fs.mkdirSync(directory, {recursive: true})
-        shell.openPath(directory)
+        const dir = functions.escape(directory)
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, {recursive: true})
+        ipcRenderer.invoke("open-location", dir)
     }
 
     const sourceAction = () => {
