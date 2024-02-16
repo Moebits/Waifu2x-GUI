@@ -29,6 +29,14 @@ let cuganPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/w
 let webpPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/webp")
 let rifePath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/rife-fps/rife")
 let scriptsPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/scripts")
+if (process.platform === "win32") {
+  waifu2xPath = path.join(app.getAppPath(), "./node_modules/waifu2x/waifu2x")
+  esrganPath = path.join(app.getAppPath(), "./node_modules/waifu2x/real-esrgan")
+  cuganPath = path.join(app.getAppPath(), "./node_modules/waifu2x/real-cugan")
+  webpPath = path.join(app.getAppPath(), "./node_modules/waifu2x/webp")
+  rifePath = path.join(app.getAppPath(), "./node_modules/rife-fps/rife")
+  scriptsPath = path.join(app.getAppPath(), "./node_modules/waifu2x/scripts")
+}
 if (!fs.existsSync(ffmpegPath)) ffmpegPath = undefined
 if (!fs.existsSync(modelPath)) modelPath = path.join(__dirname, "../models")
 if (!fs.existsSync(waifu2xPath)) waifu2xPath = path.join(__dirname, "../waifu2x")

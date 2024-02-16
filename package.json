@@ -57,6 +57,7 @@
       }
     },
     "win": {
+      "asar": false,
       "target": {
         "target": "nsis",
         "arch": "x64"
