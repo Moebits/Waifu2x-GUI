@@ -26,6 +26,7 @@ if (process.platform === "win32") modelPath = path.join(app.getAppPath(), "../..
 let waifu2xPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/waifu2x")
 let esrganPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/real-esrgan")
 let cuganPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/real-cugan")
+let anime4kPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/anime4k")
 let webpPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/webp")
 let rifePath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/rife-fps/rife")
 let scriptsPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/scripts")
@@ -33,6 +34,7 @@ if (process.platform === "win32") {
   waifu2xPath = path.join(app.getAppPath(), "./node_modules/waifu2x/waifu2x")
   esrganPath = path.join(app.getAppPath(), "./node_modules/waifu2x/real-esrgan")
   cuganPath = path.join(app.getAppPath(), "./node_modules/waifu2x/real-cugan")
+  anime4kPath = path.join(app.getAppPath(), "./node_modules/waifu2x/anime4k")
   webpPath = path.join(app.getAppPath(), "./node_modules/waifu2x/webp")
   rifePath = path.join(app.getAppPath(), "./node_modules/rife-fps/rife")
   scriptsPath = path.join(app.getAppPath(), "./node_modules/waifu2x/scripts")
@@ -42,6 +44,7 @@ if (!fs.existsSync(modelPath)) modelPath = path.join(__dirname, "../models")
 if (!fs.existsSync(waifu2xPath)) waifu2xPath = path.join(__dirname, "../waifu2x")
 if (!fs.existsSync(esrganPath)) esrganPath = path.join(__dirname, "../real-esrgan")
 if (!fs.existsSync(cuganPath)) cuganPath = path.join(__dirname, "../real-cugan")
+if (!fs.existsSync(anime4kPath)) anime4kPath = path.join(__dirname, "../anime4k")
 if (!fs.existsSync(webpPath)) webpPath = path.join(__dirname, "../webp")
 if (!fs.existsSync(scriptsPath)) scriptsPath = path.join(__dirname, "../scripts")
 if (!fs.existsSync(rifePath)) rifePath = path.join(__dirname, "../rife")
@@ -224,10 +227,12 @@ const upscale = async (info: any) => {
     upscaler: info.upscaler,
     pngFrames: info.pngFrames,
     downscaleHeight: info.pdfDownscale ? Number(info.pdfDownscale) : undefined,
+    pythonDownscale: info.pythonDownscale ? Number(info.pythonDownscale) : undefined,
     ffmpegPath,
     waifu2xPath,
     esrganPath,
     cuganPath,
+    anime4kPath,
     scriptsPath,
     rifePath,
     webpPath
@@ -463,7 +468,7 @@ if (!singleLock) {
     window.removeMenu()
     if (process.platform !== "win32") {
       if (ffmpegPath) fs.chmodSync(ffmpegPath, "777")
-      waifu2x.chmod777(waifu2xPath, webpPath, esrganPath, cuganPath, rifePath)
+      waifu2x.chmod777(waifu2xPath, webpPath, esrganPath, cuganPath, anime4kPath, rifePath)
     }
     require("@electron/remote/main").enable(window.webContents)
     window.on("closed", () => {

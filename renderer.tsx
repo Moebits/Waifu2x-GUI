@@ -41,6 +41,7 @@ export const UpscalerContext = React.createContext<any>(null)
 export const CompressContext = React.createContext<any>(null)
 export const PNGFramesContext = React.createContext<any>(null)
 export const PDFDownscaleContext = React.createContext<any>(null)
+export const PythonDownscaleContext = React.createContext<any>(null)
 export const AdvSettingsContext = React.createContext<any>(null)
 
 const App = () => {
@@ -70,6 +71,7 @@ const App = () => {
   const [compress, setCompress] = useState(true)
   const [pngFrames, setPNGFrames] = useState(false)
   const [pdfDownscale, setPDFDownscale] = useState(0)
+  const [pythonDownscale, setPythonDownscale] = useState(0)
   const [advSettings, setAdvSettings] = useState(false)
 
   const [previewVisible, setPreviewVisible] = useState(false)
@@ -80,6 +82,7 @@ const App = () => {
 
   return (
     <main className="app">
+      <PythonDownscaleContext.Provider value={{pythonDownscale, setPythonDownscale}}>
       <PDFDownscaleContext.Provider value={{pdfDownscale, setPDFDownscale}}>
       <PNGFramesContext.Provider value={{pngFrames, setPNGFrames}}>
       <FPSMultiplierContext.Provider value={{fpsMultiplier, setFPSMultiplier}}>
@@ -144,6 +147,7 @@ const App = () => {
       </FPSMultiplierContext.Provider>
       </PNGFramesContext.Provider>
       </PDFDownscaleContext.Provider>
+      </PythonDownscaleContext.Provider>
     </main>
   )
 }

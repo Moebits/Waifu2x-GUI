@@ -20,7 +20,8 @@ import trashButtonHover from "../assets/trashButton-hover.png"
 import trashButton from "../assets/trashButton.png"
 import {DirectoryContext, FramerateContext, SDColorSpaceContext, UpscalerContext, CompressContext, FPSMultiplierContext, PNGFramesContext,
 GIFQualityContext, GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext, PDFDownscaleContext,
-PitchContext, PNGCompressionContext, PreviewContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext} from "../renderer"
+PitchContext, PNGCompressionContext, PreviewContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext,
+PythonDownscaleContext} from "../renderer"
 import functions from "../structures/functions"
 import "../styles/filecontainer.less"
 
@@ -55,6 +56,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     const {pngCompression} = useContext(PNGCompressionContext)
     const {jpgQuality} = useContext(JPGQualityContext)
     const {parallelFrames} = useContext(ParallelFramesContext)
+    const {pythonDownscale} = useContext(PythonDownscaleContext)
     const {threads} = useContext(ThreadsContext)
     const {upscaler} = useContext(UpscalerContext)
     const {compress} = useContext(CompressContext)
@@ -170,7 +172,9 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         setStartSignal(false)
         let fps = props.framerate! * fpsMultiplier
         const quality = props.type === "gif" ? gifQuality : videoQuality
-        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, pitch, scale, noise, mode, fpsMultiplier, speed, reverse, quality, rename, pngCompression, jpgQuality, parallelFrames, threads, upscaler, compress, gifTransparency, sdColorSpace, pngFrames, pdfDownscale}, startAll)
+        ipcRenderer.invoke("upscale", {id: props.id, source: props.source, dest: directory, type: props.type, framerate: fps, pitch, scale, noise, 
+        mode, fpsMultiplier, speed, reverse, quality, rename, pngCompression, jpgQuality, parallelFrames, threads, upscaler, compress, gifTransparency, 
+        sdColorSpace, pngFrames, pdfDownscale, pythonDownscale}, startAll)
         setLockedStats({framerate: fps, noise, scale, mode, speed, reverse})
         if (!startAll) {
             setStarted(true)

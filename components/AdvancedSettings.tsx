@@ -6,7 +6,7 @@ import {Dropdown, DropdownButton} from "react-bootstrap"
 import {FramerateContext, GIFQualityContext, SDColorSpaceContext, CompressContext, FPSMultiplierContext,
 GIFTransparencyContext, JPGQualityContext, ModeContext, NoiseContext, OriginalFramerateContext, ParallelFramesContext, UpscalerContext,
 PitchContext, PNGCompressionContext, RenameContext, ReverseContext, ScaleContext, SpeedContext, ThreadsContext, VideoQualityContext, QueueContext,
-AdvSettingsContext, PNGFramesContext, PDFDownscaleContext} from "../renderer"
+AdvSettingsContext, PNGFramesContext, PDFDownscaleContext, PythonDownscaleContext} from "../renderer"
 import functions from "../structures/functions"
 import path from "path"
 import "../styles/advancedsettings.less"
@@ -36,6 +36,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
     const {fpsMultiplier, setFPSMultiplier} = useContext(FPSMultiplierContext)
     const {pngFrames, setPNGFrames} = useContext(PNGFramesContext)
     const {pdfDownscale, setPDFDownscale} = useContext(PDFDownscaleContext)
+    const {pythonDownscale, setPythonDownscale} = useContext(PythonDownscaleContext)
     const [pythonModels, setPythonModels] = useState([])
 
     useEffect(() => {
@@ -80,6 +81,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
             setCompress(settings.compress)
             setPNGFrames(settings.pngFrames)
             setPDFDownscale(settings.pdfDownscale)
+            setPythonDownscale(settings.pythonDownscale)
         }
         const pythonModels = await ipcRenderer.invoke("get-python-models")
         if (pythonModels.length) setPythonModels(pythonModels)
@@ -87,7 +89,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
 
     useEffect(() => {
         ipcRenderer.invoke("store-settings", {framerate, pitch, rename, originalFramerate, videoQuality, gifQuality, gifTransparency, 
-        pngCompression, jpgQuality, parallelFrames, threads, queue, sdColorSpace, upscaler, compress, pngFrames, pdfDownscale})
+        pngCompression, jpgQuality, parallelFrames, threads, queue, sdColorSpace, upscaler, compress, pngFrames, pdfDownscale, pythonDownscale})
         functions.logoDrag(!advSettings)
     })
 
@@ -120,6 +122,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setCompress(true)
         setPNGFrames(false)
         setPDFDownscale(0)
+        setPythonDownscale(0)
     }
 
     const changeRename = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -262,6 +265,26 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         }
     }
 
+    const changePythonDownscale = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value
+        if (value.includes(".")) return
+        if (Number.isNaN(Number(value))) return
+        setPythonDownscale(value)
+    }
+
+    const changePythonDownscaleKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowUp") {
+            setPythonDownscale((prev: any) => {
+                return Number(prev) + 100
+            })
+        } else if (event.key === "ArrowDown") {
+            setPythonDownscale((prev: any) => {
+                if (Number(prev) - 100 < 0) return Number(prev)
+                return Number(prev) - 100
+            })
+        }
+    }
+
     const changeParallelFrames = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         if (value.includes(".")) return
@@ -337,6 +360,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         if (upscaler === "waifu2x") return "waifu2x"
         if (upscaler === "real-esrgan") return "Real-ESRGAN"
         if (upscaler === "real-cugan") return "Real-CUGAN"
+        if (upscaler === "anime4k") return "Anime4K"
         return path.basename(upscaler, path.extname(upscaler))
     }
 
@@ -362,6 +386,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                                 <Dropdown.Item active={upscaler === "waifu2x"} onClick={() => setUpscaler("waifu2x")}>waifu2x</Dropdown.Item>
                                 <Dropdown.Item active={upscaler === "real-esrgan"} onClick={() => setUpscaler("real-esrgan")}>Real-ESRGAN</Dropdown.Item>
                                 <Dropdown.Item active={upscaler === "real-cugan"} onClick={() => setUpscaler("real-cugan")}>Real-CUGAN</Dropdown.Item>
+                                <Dropdown.Item active={upscaler === "anime4k"} onClick={() => setUpscaler("anime4k")}>Anime4K</Dropdown.Item>
                                 {pythonModelsJSX()}
                             </DropdownButton>
                         </div>
@@ -414,6 +439,10 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                         <div className="settings-row">
                             <p className="settings-text">PDF Downscale: </p>
                             <input className="settings-input" type="text" spellCheck="false" value={pdfDownscale} onChange={changePDFDownscale} onKeyDown={changePDFDownscaleKey}/>
+                        </div>
+                        <div className="settings-row">
+                            <p className="settings-text">Python Downscale: </p>
+                            <input className="settings-input" type="text" spellCheck="false" value={pythonDownscale} onChange={changePythonDownscale} onKeyDown={changePythonDownscaleKey}/>
                         </div>
                         <div className="settings-row">
                                 <p className="settings-text">Concurrent Upscales: </p>
