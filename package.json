@@ -144,6 +144,6 @@
     "react-reorder": "^3.0.0-alpha.7",
     "shade-blend-color": "^1.0.0",
     "sharp": "^0.33.2",
-    "waifu2x": "^1.3.1"
+    "waifu2x": "^1.3.2"
   }
 }
