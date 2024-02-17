@@ -58,7 +58,7 @@
       }
     },
     "win": {
-      "asar": false,
+      "asar": true,
       "target": {
         "target": "nsis",
         "arch": "x64"
@@ -90,6 +90,7 @@
     },
     "files": [
       "dist/**/*",
+      "**/*.dll",
       "package.json"
     ],
     "publish": {
