@@ -47,6 +47,13 @@ To install, download the latest installer from the [releases](https://github.com
 
 Note: If you install it under `C:/Program Files` you might need to run it as administrator.
 
+### MacOS
+
+On MacOS unsigned applications won't open, run this to remove the quarantine flag.
+```
+xattr -d com.apple.quarantine /Applications/Waifu2x\ GUI.app
+```
+
 ### Bugs and Requests
 
 Open an issue on my GitHub repository. I appreciate any requests, but I can't guarantee that I will fulfill all of them.
