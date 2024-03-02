@@ -33,14 +33,26 @@ Real-CUGAN only supports scale factors 1/2/3/4, and noise level -1/0/1/2/3 and o
 
 ### Custom Models
 
-You can add custom pytorch models (with ESRGAN architecture) to the "models" folder in the location the app is installed, same place
-ffmpeg folder is located. If the folder doesn't exist, create it.
+You can add custom pytorch models to the "models" folder in the location the app is installed, same place
+ffmpeg folder is located. If the folder doesn't exist, create it. You need to install python in order to run them. If you 
+still have trouble, try installing the dependencies:
+
+```
+pip3 install torch torchvision opencv-python Pillow numpy spandrel --compile --force-reinstall
+```
 
 ### Installation
 
 To install, download the latest installer from the [releases](https://github.com/Tenpi/Waifu2x-GUI/releases) tab. Updates can be installed automatically.
 
 Note: If you install it under `C:/Program Files` you might need to run it as administrator.
+
+### MacOS
+
+On MacOS unsigned applications won't open, run this to remove the quarantine flag.
+```
+xattr -d com.apple.quarantine /Applications/Waifu2x\ GUI.app
+```
 
 ### Bugs and Requests
 
