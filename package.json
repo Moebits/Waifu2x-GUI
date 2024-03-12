@@ -1,6 +1,6 @@
 {
   "name": "waifu2x-gui",
-  "version": "0.4.9",
+  "version": "0.5.0",
   "description": "A gui app that upscales anime-styled images with waifu2x",
   "main": "dist/main.js",
   "scripts": {
@@ -41,7 +41,7 @@
     "mac": {
       "target": {
         "target": "dmg",
-        "arch": "arm64"
+        "arch": "universal"
       },
       "category": "public.app-category.utilities",
       "extraFiles": [
@@ -117,7 +117,7 @@
     "cross-env": "^7.0.3",
     "css-loader": "^5.0.1",
     "del-cli": "^3.0.1",
-    "electron": "^29.0.1",
+    "electron": "^22.3.27",
     "electron-builder": "^23.0.2",
     "file-loader": "^6.2.0",
     "fork-ts-checker-webpack-plugin": "^6.1.0",
