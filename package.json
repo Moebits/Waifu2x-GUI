@@ -27,10 +27,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Tenpi/Waifu2x-GUI"
+    "url": "https://github.com/Moebits/Waifu2x-GUI"
   },
   "build": {
-    "appId": "com.tenpi.waifu2x",
+    "appId": "com.moebits.waifu2x",
     "productName": "Waifu2x GUI",
     "icon": "./assets/icon.png",
     "directories": {
@@ -96,7 +96,7 @@
     "publish": {
       "provider": "github",
       "repo": "Waifu2x-GUI",
-      "owner": "Tenpi",
+      "owner": "Moebits",
       "releaseType": "draft"
     },
     "asar": true,
@@ -105,11 +105,10 @@
       "node_modules/**/*.node"
     ]
   },
-  "author": "Tenpi",
+  "author": "Moebits",
   "license": "MIT",
   "devDependencies": {
     "@electron/rebuild": "^3.6.0",
-    "@tenpi/tslint": "^1.1.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/sharp": "^0.31.1",
