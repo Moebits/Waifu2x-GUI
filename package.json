@@ -139,7 +139,7 @@
     "electron-store": "^7.0.1",
     "electron-updater": "^4.3.5",
     "image-size": "^0.9.3",
-    "images-meta": "github:Tenpi/images-meta",
+    "images-meta": "github:Moebits/images-meta",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.3",
     "react-dom": "^17.0.1",
