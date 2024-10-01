@@ -29,10 +29,7 @@ module.exports = [
       new ForkTsCheckerWebpackPlugin(),
       new HtmlWebpackPlugin({template: path.resolve(__dirname, "./index.html"), minify: true}),
       new MiniCssExtractPlugin({filename: "styles.css", chunkFilename: "styles.css"}),
-      new webpack.DefinePlugin({"process.env.FLUENTFFMPEG_COV": false}),
-      new CopyPlugin({
-        patterns: copyPatterns
-      })
+      new webpack.DefinePlugin({"process.env.FLUENTFFMPEG_COV": false})
     ],
     devServer: {contentBase: path.join(__dirname, "./dist"), port: 9000, compress: true, hot: true, historyApiFallback: true, publicPath: "/"},
   },
