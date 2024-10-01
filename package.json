@@ -1,21 +1,20 @@
 {
   "name": "waifu2x-gui",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A gui app that upscales anime-styled images with waifu2x",
   "main": "dist/main.js",
   "scripts": {
     "start": "npm run clean && webpack && cross-env DEVELOPMENT=true electron dist/main.js",
     "start-fast": "electron dist/main.js",
     "clean": "del-cli ./dist",
-    "build": "npm run clean ./build && webpack && electron-builder -p never",
+    "build": "npm run clean ./build && webpack && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -p never",
     "build-fast": "webpack && electron-builder -p never",
-    "rebuild": "electron-rebuild -f -w canvas",
-    "release": "npm run release:win && npm run release:linux && npm run release:mac",
+    "rebuild": "electron-rebuild -f -w @napi-rs/canvas",
+    "release": "npm run release:mac && npm run release:linux && npm run release:win",
     "release:mac": "npm run clean ./build && webpack && npm run sharp:mac && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -m -p always",
     "release:win": "npm run clean ./build && webpack && npm run sharp:win && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -w -p always",
     "release:linux": "npm run clean ./build && webpack && npm run sharp:linux && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -l -p always",
     "sharp:mac": "del-cli ./node_modules/sharp && npm install --platform=darwin --arch=arm64 sharp",
-    "sharp:mac64": "del-cli ./node_modules/sharp && npm install --platform=darwin --arch=x64 sharp",
     "sharp:win": "del-cli ./node_modules/sharp && npm install --platform=win32 --arch=x64 sharp",
     "sharp:linux": "del-cli ./node_modules/sharp && npm install --platform=linux --arch=x64 sharp"
   },
@@ -41,7 +40,7 @@
     "mac": {
       "target": {
         "target": "dmg",
-        "arch": "universal"
+        "arch": "arm64"
       },
       "category": "public.app-category.utilities",
       "extraFiles": [
@@ -58,7 +57,6 @@
       }
     },
     "win": {
-      "asar": false,
       "target": {
         "target": "nsis",
         "arch": "x64"
@@ -117,7 +115,7 @@
     "css-loader": "^5.0.1",
     "del-cli": "^3.0.1",
     "electron": "^22.3.27",
-    "electron-builder": "^23.0.2",
+    "electron-builder": "^24.9.1",
     "file-loader": "^6.2.0",
     "fork-ts-checker-webpack-plugin": "^6.1.0",
     "html-loader": "^1.3.2",
@@ -134,11 +132,9 @@
   },
   "dependencies": {
     "@electron/remote": "^2.1.2",
-    "@napi-rs/canvas": "^0.1.44",
     "bootstrap": "^4.6.0",
     "electron-store": "^7.0.1",
     "electron-updater": "^4.3.5",
-    "image-size": "^0.9.3",
     "images-meta": "github:Moebits/images-meta",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.3",
@@ -146,7 +142,7 @@
     "react-dropzone": "^11.3.0",
     "react-reorder": "^3.0.0-alpha.7",
     "shade-blend-color": "^1.0.0",
-    "sharp": "^0.33.2",
-    "waifu2x": "^1.4.2"
+    "sharp": "^0.33.5",
+    "waifu2x": "^1.4.6"
   }
 }

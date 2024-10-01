@@ -7,29 +7,6 @@ const path = require("path")
 const webpack = require("webpack")
 const exclude = [/node_modules/, /dist/]
 
-let copyPatterns = [{from: "structures/pdf.worker.js", to: "[name][ext]"}]
-
-if (process.platform === "win32") {
-  copyPatterns.push(...[
-    {from: "node_modules/canvas/build/Release/jpeg62.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libcairo-2.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libexpat-1.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libfontconfig-1.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libfreetype-6.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libglib-2.0-0.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libgmodule-2.0-0.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libgobject-2.0-0.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libgthread-2.0-0.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libintl-8.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libpango-1.0-0.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libpangocairo-1.0-0.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libpangoft2-1.0-0.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libpangowin32-1.0-0.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/libpng14-14.dll", to: "[name][ext]"},
-    {from: "node_modules/canvas/build/Release/zlib1.dll", to: "[name][ext]"}
-  ])
-}
-
 module.exports = [
   {
     target: "electron-renderer",
@@ -38,7 +15,7 @@ module.exports = [
     node: {__dirname: false},
     output: {filename: "renderer.js", path: path.resolve(__dirname, "./dist"), publicPath: "./"},
     resolve: {extensions: [".js", ".jsx", ".ts", ".tsx"], mainFields: ["main", "module", "browser"], alias: {"react-dom$": "react-dom/profiling", "scheduler/tracing": "scheduler/tracing-profiling"}},
-    optimization: {minimize: true, minimizer: [new TerserJSPlugin({extractComments: false})], moduleIds: "named"},
+    optimization: {minimize: false, minimizer: [new TerserJSPlugin({extractComments: false})], moduleIds: "named"},
     module: {
       rules: [
         {test: /\.(jpe?g|png|gif|svg|mp3|wav|mp4|yml|txt)$/, exclude, use: [{loader: "file-loader", options: {name: "[path][name].[ext]"}}]},
@@ -64,10 +41,10 @@ module.exports = [
     entry: "./main",
     mode: "production",
     node: {__dirname: false},
-    externals: {"sharp": "commonjs sharp"},
+    externals: {"sharp": "commonjs sharp", "@napi-rs/canvas": "commonjs @napi-rs/canvas"},
     output: {filename: "main.js", path: path.resolve(__dirname, "./dist")},
     resolve: {extensions: [".js", ".jsx", ".ts", ".tsx"], alias: {"react-dom$": "react-dom/profiling", "scheduler/tracing": "scheduler/tracing-profiling"}},
-    optimization: {minimize: true, minimizer: [new TerserJSPlugin({extractComments: false})], moduleIds: "named"},
+    optimization: {minimize: false, minimizer: [new TerserJSPlugin({extractComments: false})], moduleIds: "named"},
     module: {
       rules: [
           {test: /\.(jpe?g|png|gif|svg|mp3|wav|mp4|yml|txt)$/, exclude, use: [{loader: "file-loader", options: {name: "[path][name].[ext]"}}]},

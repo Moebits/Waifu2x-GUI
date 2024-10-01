@@ -2,7 +2,7 @@ import {ipcRenderer} from "electron"
 import fs from "fs"
 import path from "path"
 
-const images = [".png", ".jpg", ".jpeg", ".webp", ".tiff"]
+const images = [".png", ".jpg", ".jpeg", ".webp", ".avif", ".jxl", ".tiff"]
 const gifs = [".gif"]
 const videos = [".mp4", ".ogv", ".webm", ".avi", ".mov", ".mkv", ".flv"]
 

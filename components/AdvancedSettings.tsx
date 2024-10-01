@@ -106,7 +106,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setGIFTransparency(true)
         setGIFQuality(10)
         setPNGCompression(3)
-        setJPGQuality(100)
+        setJPGQuality(95)
         setParallelFrames(2)
         setThreads(4)
         setNoise(2)
@@ -426,7 +426,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
                             <input className="settings-input" type="text" spellCheck="false" value={pngCompression} onChange={changePNGCompression} onKeyDown={changePNGCompressionKey}/>
                         </div>
                         <div className="settings-row">
-                            <p className="settings-text">JPG/WEBP Quality: </p>
+                            <p className="settings-text">JPG/WEBP/AVIF Quality: </p>
                             <input className="settings-input" type="text" spellCheck="false" value={jpgQuality} onChange={changeJPGQuality} onKeyDown={changeJPGQualityKey}/>
                         </div>
                         <div className="settings-row">

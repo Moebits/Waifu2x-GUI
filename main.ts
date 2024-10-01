@@ -3,7 +3,6 @@ import Store from "electron-store"
 import {autoUpdater} from "electron-updater"
 import sharp from "sharp"
 import fs from "fs"
-import imageSize from "image-size"
 import path from "path"
 import process from "process"
 import waifu2x from "waifu2x"
@@ -301,10 +300,31 @@ const upscale = async (info: any) => {
           meta[i].value = meta[i].value.replaceAll("UNICODE", "").replaceAll(/\u0000/g, "")
         }
       } catch {}
+      let avif = false
+      let jxl = false
+      let sourceExt = path.extname(info.source)
+      if (path.extname(info.source) === ".avif" || path.extname(info.source) === ".jxl") {
+        if (path.extname(info.source) === ".avif") avif = true
+        if (path.extname(info.source) === ".jxl") jxl = true
+        const buffer = await sharp(fs.readFileSync(info.source), {limitInputPixels: false}).png().toBuffer()
+        const newDest = dest.replace(path.extname(dest), ".png")
+        fs.writeFileSync(newDest, buffer)
+        info.source = newDest
+        dest = newDest
+      }
       output = await waifu2x.upscaleImage(info.source, dest, options, action)
+      if (avif || jxl) {
+        let buffer = sharp(fs.readFileSync(dest), {limitInputPixels: false})
+        if (avif) buffer = buffer.avif({quality: options.jpgWebpQuality})
+        if (jxl) buffer = buffer.jxl({quality: options.jpgWebpQuality})
+        const newDest = dest.replace(path.extname(dest), sourceExt)
+        fs.renameSync(dest, newDest)
+        fs.writeFileSync(newDest, await buffer.toBuffer())
+        output = newDest
+      }
       if (info.compress) {
         const inputBuffer = fs.readFileSync(output)
-        const outputBuffer = await sharp(inputBuffer, {limitInputPixels: false}).jpeg().toBuffer()
+        const outputBuffer = await sharp(inputBuffer, {limitInputPixels: false}).jpeg({optimiseScans: true, trellisQuantisation: true, quality: options.jpgWebpQuality}).toBuffer()
         fs.writeFileSync(output, outputBuffer)
         const renamePath = path.join(path.dirname(output), `${path.basename(output, path.extname(output))}.jpg`)
         fs.renameSync(output, renamePath)
@@ -391,7 +411,7 @@ ipcMain.handle("get-dimensions", async (event, path: string, type: string, optio
     const dimensions = await waifu2x.pdfDimensions(path, {downscaleHeight: undefined})
     return {width: dimensions.width, height: dimensions.height, image: dimensions.image}
   } else {
-    const dimensions = imageSize(path)
+    const dimensions = await sharp(fs.readFileSync(path), {limitInputPixels: false}).metadata()
     return {width: dimensions.width, height: dimensions.height}
   }
 })
@@ -417,8 +437,8 @@ ipcMain.handle("select-files", async () => {
   const files = await dialog.showOpenDialog(window, {
     filters: [
       {name: "All Files", extensions: ["*"]},
-      {name: "Images", extensions: ["png", "jpg", "jpeg", "webp", "tiff"]},
-      {name: "GIF", extensions: ["gif"]},
+      {name: "Images", extensions: ["png", "jpg", "jpeg", "webp", "avif", "jxl", "tiff"]},
+      {name: "Animations", extensions: ["gif", "webp"]},
       {name: "Videos", extensions: ["mp4", "ogv", "webm", "avi", "mov", "mkv", "flv"]},
       {name: "PDF", extensions: ["pdf"]},
     ],
@@ -464,7 +484,7 @@ if (!singleLock) {
   })
 
   app.on("ready", () => {
-    window = new BrowserWindow({width: 800, height: 600, minWidth: 720, minHeight: 450, frame: false, backgroundColor: "#5ea8da", center: true, webPreferences: {nodeIntegration: true, contextIsolation: false}})
+    window = new BrowserWindow({width: 800, height: 600, minWidth: 720, minHeight: 450, frame: false, backgroundColor: "#5ea8da", center: true, roundedCorners: false, webPreferences: {nodeIntegration: true, contextIsolation: false}})
     window.loadFile(path.join(__dirname, "index.html"))
     window.removeMenu()
     if (process.platform !== "win32") {

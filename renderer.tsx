@@ -59,7 +59,7 @@ const App = () => {
   const [videoQuality, setVideoQuality] = useState(16)
   const [gifQuality, setGIFQuality] = useState(10)
   const [pngCompression, setPNGCompression] = useState(3)
-  const [jpgQuality, setJPGQuality] = useState(100)
+  const [jpgQuality, setJPGQuality] = useState(95)
   const [parallelFrames, setParallelFrames] = useState(2)
   const [threads, setThreads] = useState(4)
   const [rename, setRename] = useState("2x")
